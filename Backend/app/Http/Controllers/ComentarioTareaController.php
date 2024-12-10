@@ -68,14 +68,10 @@ class ComentarioTareaController extends Controller
             'data' => $comentariosGuardados,
         ], 200);
     }
-        
-    public function seguimientoSemanalHastaSemanaActualcomentarios($idEmpresa)
+    public function seguimientoSemanalEmpresaHastaSemanaActual($idPlanificacion)
     {
-        // Obtener la empresa
-        $empresa = Empresa::findOrFail($idEmpresa);
-
-        // Obtener la planificación aceptada y publicada de la empresa
-        $planificacion = $empresa->planificaciones()
+        // Obtener la planificación aceptada y publicada
+        $planificacion = Planificacion::where('idPlanificacion', $idPlanificacion)
             ->where('aceptada', true)
             ->where('publicada', true)
             ->first();
@@ -84,163 +80,98 @@ class ComentarioTareaController extends Controller
             return response()->json(['error' => 'No se encontró planificación aceptada y publicada'], 404);
         }
 
-        // Obtener los sprints de la planificación que cumplen con la condición de fecha
-        $sprints = $planificacion->sprints()
-            ->where(function ($query) {
-                $query->whereDate('fechaIni', '<=', now())
-                    ->whereDate('fechaFin', '>=', now());
-            })
-            ->orWhereDate('fechaFin', '<', now())
-            ->where('idPlanificacion', $planificacion->idPlanificacion)
+        // Obtener la empresa asociada a la planificación
+        $empresa = $planificacion->empresa;
+
+        if (!$empresa) {
+            return response()->json(['error' => 'No se encontró la empresa asociada a la planificación'], 404);
+        }
+
+        // Obtener el número total de estudiantes de la empresa
+        $numEstudiantes = $empresa->estudiantes()->count();
+
+        // Obtener todas las semanas asociadas a la planificación hasta la fecha actual
+        $semanas = Semana::where('idPlanificacion', $planificacion->idPlanificacion)
+            ->whereDate('fechaFin', '<=', now())
             ->get();
 
-        $resultado = [];
-        $fechaDeLaConsulta = now();
+        // Construir el resultado con los datos básicos y el estado de calificación
+        $resultado = $semanas->map(function ($semana) use ($numEstudiantes) {
+            $numComentariosTarea = ComentarioTarea::where('idSemana', $semana->idSemana)->count();
 
-        foreach ($sprints as $sprint) {
-            $sprintData = [
-                'idSprint' => $sprint->idSprint,
-                'numSprint' => $sprint->numeroSprint,
-                'semanas' => []
+            return [
+                'idSemana' => $semana->idSemana,
+                'numSemana' => $semana->numeroSemana,
+                'fechaIni' => $semana->fechaIni,
+                'fechaFin' => $semana->fechaFin,
+                'calificado' => ($numComentariosTarea === $numEstudiantes),
             ];
-
-            // Obtener las semanas del sprint
-            $semanas = $sprint->semanas()
-                ->where(function ($query) use ($fechaDeLaConsulta) {
-                    $query->whereDate('fechaIni', '<=', $fechaDeLaConsulta)
-                        ->whereDate('fechaFin', '>', $fechaDeLaConsulta)
-                        ->orWhereDate('fechaFin', '<=', $fechaDeLaConsulta);
-                })
-                ->get();
-
-            foreach ($semanas as $semana) {
-                // Obtener los comentariosTareas para cada semana
-                $comentariosTareas = $semana->comentarioTarea()->get()->map(function ($comentario) {
-                    return [
-                        'idEstudiante' => $comentario->idEstudiante,
-                        'comentario' => $comentario->comentario,
-                    ];
-                });
-
-                $semanaData = [
-                    'idSemana' => $semana->idSemana,
-                    'numeroSemana' => $semana->numeroSemana,
-                    'comentariosTareas' => $comentariosTareas,
-                ];
-
-                $sprintData['semanas'][] = $semanaData;
-            }
-
-            $resultado[] = $sprintData;
-        }
-
-    return response()->json($resultado);
-}
-
-
-
-    public function seguimientoSemanalEmpresaHastaSemanaActual($idEmpresa)
-    {
-        // Obtener la empresa
-        $empresa = Empresa::findOrFail($idEmpresa);
-
-        // Obtener la planificación aceptada y publicada de la empresa
-        $planificacion = $empresa->planificaciones()
-            ->where('aceptada', true)
-            ->where('publicada', true)
-            ->first();
-
-        if (!$planificacion) {
-            return response()->json(['error' => 'No se encontró planificación aceptada y publicada'], 404);
-        }
-
-        // Obtener los sprints de la planificación que cumplen con la condición de fecha
-        $sprints = $planificacion->sprints()
-            ->where(function ($query) {
-                $query->whereDate('fechaIni', '<=', now())
-                    ->whereDate('fechaFin', '>=', now());
-            })
-            ->orWhereDate('fechaFin', '<', now())
-            ->where('idPlanificacion', $planificacion->idPlanificacion)
-            ->get();
-
-        $resultado = [];
-        $fechaDeLaConsulta = now();
-
-        foreach ($sprints as $sprint) {
-            $sprintData = [
-                'idSprint' => $sprint->idSprint,
-                'numSprint' => $sprint->numeroSprint,
-                'semanas' => []
-            ];
-
-            // Obtener las semanas del sprint
-            $semanas = $sprint->semanas()
-                ->where(function ($query) use ($fechaDeLaConsulta, $sprint) {
-                    $query->where('idSprint', $sprint->idSprint)
-                        ->where(function ($subQuery) use ($fechaDeLaConsulta) {
-                            $subQuery->whereDate('fechaIni', '<=', $fechaDeLaConsulta)
-                                ->whereDate('fechaFin', '>', $fechaDeLaConsulta);
-                        })
-                        ->orWhere(function ($subQuery) use ($fechaDeLaConsulta) {
-                            $subQuery->whereDate('fechaFin', '<=', $fechaDeLaConsulta);
-                        });
-                })
-                ->get();
-
-            foreach ($semanas as $semana) {
-                // Inicializar arreglo de tareas únicas
-                $tareasSemana = [];
-                $tareasEstudianteData = [];
-
-                foreach ($semana->tareas as $tarea) {
-                    // Asegurarse de que no haya duplicados en tareas de la semana
-                    if (!isset($tareasSemana[$tarea->idTarea])) {
-                        $tareasSemana[$tarea->idTarea] = [
-                            'idTarea' => $tarea->idTarea,
-                            'nombreTarea' => $tarea->nombreTarea
-                        ];
-                    }
-
-                    // Procesar las tareas por estudiantes
-                    foreach ($tarea->tareaEstudiantes as $tareaEstudiante) {
-                        $idEstudiante = $tareaEstudiante->estudiantes->idEstudiante;
-
-                        if (isset($tareasEstudianteData[$idEstudiante])) {
-                            $tareasEstudianteData[$idEstudiante]['tareas'][] = [
-                                'idTarea' => $tarea->idTarea,
-                                'nombreTarea' => $tarea->nombreTarea
-                            ];
-                        } else {
-                            $tareasEstudianteData[$idEstudiante] = [
-                                'idEstudiante' => $idEstudiante,
-                                'nombre' => $tareaEstudiante->estudiantes->nombreEstudiante,
-                                'apellido' => $tareaEstudiante->estudiantes->primerApellido . ' ' . $tareaEstudiante->estudiantes->segundoApellido,
-                                'tareas' => [
-                                    [
-                                        'idTarea' => $tarea->idTarea,
-                                        'nombreTarea' => $tarea->nombreTarea
-                                    ]
-                                ]
-                            ];
-                        }
-                    }
-                }
-
-                // Agregar la información de la semana al sprint
-                $sprintData['semanas'][] = [
-                    'idSemana' => $semana->idSemana,
-                    'numSemana' => $semana->numeroSemana,
-                    'tareas' => array_values($tareasSemana), // Tareas únicas en la semana
-                    'tareasEstudiante' => array_values($tareasEstudianteData) // Tareas por estudiante
-                ];
-            }
-
-            $resultado[] = $sprintData;
-        }
+        });
 
         return response()->json($resultado);
     }
+    public function getSemanaSeguimiento($idEmpresa, $idSemana)
+    {
+        // Buscar la semana específica
+        $semana = Semana::find($idSemana);
+
+        if (!$semana) {
+            return response()->json(['error' => 'Semana no encontrada'], 404);
+        }
+
+        // Obtener los estudiantes de la empresa
+        $estudiantes = Estudiante::whereHas('empresas', function ($query) use ($idEmpresa) {
+            $query->where('estudiantesempresas.idEmpresa', $idEmpresa); // Calificación explícita de la columna
+        })->get();
+
+        // Inicializar el resultado
+        $resultado = [
+            'idSemana' => $semana->idSemana,
+            'numSemana' => $semana->numeroSemana,
+            'fechaIni' => $semana->fechaIni,
+            'fechaFin' => $semana->fechaFin,
+            'comentarios' => ComentarioTarea::where('idSemana', $idSemana)->get(),
+            'estudiantes' => [],
+        ];
+
+        // Procesar tareas y comentarios de cada estudiante
+        foreach ($estudiantes as $estudiante) {
+            // Obtener tareas asignadas al estudiante para esta semana
+            $tareasEstudiante = TareaEstudiante::whereHas('tareas', function ($query) use ($idSemana) {
+                $query->where('idSemana', $idSemana);
+            })->where('idEstudiante', $estudiante->idEstudiante)
+            ->get();
+
+            if ($tareasEstudiante->isEmpty()) {
+                // Estudiante sin tareas asignadas
+                $resultado['estudiantes'][] = [
+                    'idEstudiante' => $estudiante->idEstudiante,
+                    'nombre' => $estudiante->nombreEstudiante,
+                    'apellido' => $estudiante->primerApellido . ' ' . $estudiante->segundoApellido,
+                    'tareas' => []
+                ];
+            } else {
+                // Procesar las tareas del estudiante
+                $tareas = $tareasEstudiante->map(function ($tareaEstudiante) {
+                    return [
+                        'idTarea' => $tareaEstudiante->tareas->idTarea,
+                        'nombreTarea' => $tareaEstudiante->tareas->nombreTarea,
+                    ];
+                });
+
+                $resultado['estudiantes'][] = [
+                    'idEstudiante' => $estudiante->idEstudiante,
+                    'nombre' => $estudiante->nombreEstudiante,
+                    'apellido' => $estudiante->primerApellido . ' ' . $estudiante->segundoApellido,
+                    'tareas' => $tareas,
+                ];
+            }
+        }
+
+        return response()->json($resultado);
+}
+
+    
     public function getSemanaActualTareas($idEmpresa)
     {
         try {
@@ -264,4 +195,72 @@ class ComentarioTareaController extends Controller
             return response()->json(['error' => 'Error al obtener los datos: ' . $e->getMessage()], 500);
         }
     }
+    public function seguimientoSemanalHastaSemanaActualcomentarios($idEmpresa)
+    {
+            // Obtener la empresa
+            $empresa = Empresa::findOrFail($idEmpresa);
+
+            // Obtener la planificación aceptada y publicada de la empresa
+            $planificacion = $empresa->planificaciones()
+                ->where('aceptada', true)
+                ->where('publicada', true)
+                ->first();
+
+            if (!$planificacion) {
+                return response()->json(['error' => 'No se encontró planificación aceptada y publicada'], 404);
+            }
+
+            // Obtener los sprints de la planificación que cumplen con la condición de fecha
+            $sprints = $planificacion->sprints()
+                ->where(function ($query) {
+                    $query->whereDate('fechaIni', '<=', now())
+                        ->whereDate('fechaFin', '>=', now());
+                })
+                ->orWhereDate('fechaFin', '<', now())
+                ->where('idPlanificacion', $planificacion->idPlanificacion)
+                ->get();
+
+            $resultado = [];
+            $fechaDeLaConsulta = now();
+
+            foreach ($sprints as $sprint) {
+                $sprintData = [
+                    'idSprint' => $sprint->idSprint,
+                    'numSprint' => $sprint->numeroSprint,
+                    'semanas' => []
+                ];
+
+                // Obtener las semanas del sprint
+                $semanas = $sprint->semanas()
+                    ->where(function ($query) use ($fechaDeLaConsulta) {
+                        $query->whereDate('fechaIni', '<=', $fechaDeLaConsulta)
+                            ->whereDate('fechaFin', '>', $fechaDeLaConsulta)
+                            ->orWhereDate('fechaFin', '<=', $fechaDeLaConsulta);
+                    })
+                    ->get();
+
+                foreach ($semanas as $semana) {
+                    // Obtener los comentariosTareas para cada semana
+                    $comentariosTareas = $semana->comentarioTarea()->get()->map(function ($comentario) {
+                        return [
+                            'idEstudiante' => $comentario->idEstudiante,
+                            'comentario' => $comentario->comentario,
+                        ];
+                    });
+
+                    $semanaData = [
+                        'idSemana' => $semana->idSemana,
+                        'numeroSemana' => $semana->numeroSemana,
+                        'comentariosTareas' => $comentariosTareas,
+                    ];
+
+                    $sprintData['semanas'][] = $semanaData;
+                }
+
+                $resultado[] = $sprintData;
+            }
+
+        return response()->json($resultado);
+    }
+
 }

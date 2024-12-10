@@ -1,12 +1,9 @@
 <?php
-
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\ComentarioTarea;
-use App\Models\Empresa;
 use App\Models\Planificacion;
-use App\Models\Sprint;
 use App\Models\Semana;
 use App\Models\EstudiantesEmpresas;
 use Illuminate\Support\Facades\Log;
@@ -22,26 +19,17 @@ class ComentarioTareaSeeder extends Seeder
             $planificacion = Planificacion::findOrFail(1);
             Log::info('Planificación encontrada', ['id' => $planificacion->idPlanificacion]);
 
-            // Obtener todos los sprints de la planificación
-            $sprints = $planificacion->sprints;
-            Log::info('Sprints encontrados', ['count' => $sprints->count()]);
-
-            // Obtener la empresa de la planificacion
-            $empresa = $planificacion->empresa;
-            Log::info('Empresa encontrada', ['id' => $empresa->idEmpresa]);
-
-            // Obtener todas las semanas de todos los sprints
-            $semanas = $sprints->flatMap(function ($sprint) {
-                return $sprint->semanas;
-            });
+            // Obtener todas las semanas de la planificación (sin necesidad de los sprints)
+            $semanas = Semana::where('idPlanificacion', $planificacion->idPlanificacion)->get();
             Log::info('Semanas encontradas', ['count' => $semanas->count()]);
 
-            // Obtener todos los estudiantes asociados a la empresa
-            $estudiantes = EstudiantesEmpresas::where('idEmpresa', $empresa->idEmpresa)->get();
+            // Obtener todos los estudiantes asociados a la empresa de la planificación
+            $estudiantes = EstudiantesEmpresas::where('idEmpresa', $planificacion->idEmpresa)->get();
             Log::info('Estudiantes encontrados', ['count' => $estudiantes->count()]);
 
             $comentariosCreados = 0;
 
+            // Crear comentarios para cada estudiante y semana
             foreach ($estudiantes as $estudiante) {
                 foreach ($semanas as $semana) {
                     ComentarioTarea::create([
@@ -80,7 +68,6 @@ class ComentarioTareaSeeder extends Seeder
             "Se observó poca atención a los detalles en la documentación del proyecto."
         ];
         
-
         return $comments[array_rand($comments)];
     }
 }

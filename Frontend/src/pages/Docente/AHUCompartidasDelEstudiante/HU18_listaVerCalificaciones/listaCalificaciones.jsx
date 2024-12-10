@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import ListaDefinitivaN from '../../../../components/listaDefinitiva/listaDefinitivaN';
-import { useParams } from 'react-router-dom';
 import { getPlanificacionesAceptadas } from '../../../../api/getPlanificacionesAceptadas'
 const columns = [
     {
@@ -18,7 +17,6 @@ const columns = [
   ];
 
 function ListaCali() {
-    const { idGrupo, idEstudiante} = useParams()
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState({
         error:false,
@@ -30,18 +28,17 @@ function ListaCali() {
         const fetchData = async () => {
             setLoading(true);
             try {
-                const responseData = await Promise.all([getPlanificacionesAceptadas()]);
-                
-              if (responseData.error !== undefined && responseData.error !== null) {
+                const responseData = await getPlanificacionesAceptadas();
+                console.log(responseData)
+                if (responseData.error !== undefined && responseData.error !== null) {
                     setError({
                         error:true,
                         errorMessage: "Ha ocurrido un error",
                         errorDetails: error.message,
                     });
                 } else{
-                    const [lista] = await responseData
-                    setListaEmpresas(lista);
-                    console.log(lista);
+                    setListaEmpresas(responseData);
+                    console.log(responseData);
                 }
                 
                 setLoading(false);
@@ -66,8 +63,8 @@ function ListaCali() {
       datosTabla={listaEmpresas}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack={`/`}
-      dirForward= {`/homeGrupo/${idGrupo}/empresa/calificaciones/`}
+      dirBack={`/homeDocente`}
+      dirForward= {`/homeDocente/listaEmpresaCalificaciones/empresa`}
       mensajeSearch = "Buscar empresa"
       nombreContador = "Empresas"
       loading={loading}

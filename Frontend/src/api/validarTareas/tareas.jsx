@@ -1,10 +1,11 @@
-export const getTareaData = async (idTarea) => {
+export const getTareaData = async (idTarea, idEmpresa) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/tarea/${idTarea}`, {
+    const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/tarea/${idTarea}/${idEmpresa}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: 'include'
     });
 
     if (!response.ok) {
@@ -22,7 +23,7 @@ export const getTareaData = async (idTarea) => {
 export const calificarTarea = async (idTarea, nota, comentario_docente) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/tarea/${idTarea}/calificar`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/tarea/${idTarea}/calificar`,
       {
         method: "POST",
         headers: {
@@ -32,6 +33,7 @@ export const calificarTarea = async (idTarea, nota, comentario_docente) => {
           nota,
           comentario_docente,
         }),
+        credentials: 'include'
       }
     );
 
@@ -64,10 +66,11 @@ export const updateTarea = async (idTarea, formData) => {
 
     // Enviar solicitud con FormData
     const response = await fetch(
-      `http://127.0.0.1:8000/api/tarea/${idTarea}/guardar`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/tarea/${idTarea}/guardar`,
       {
         method: "POST",
         body: data,
+        credentials: 'include'
       }
     );
 
@@ -82,15 +85,16 @@ export const updateTarea = async (idTarea, formData) => {
   }
 };
 
-export const getTareasSemana = async (idEmpresa, idSprint, idSemana) => {
+export const getTareasSemana = async (idEmpresa, idSemana) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprint/${idSprint}/semana/${idSemana}/tareas`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/semana/${idSemana}/tareas`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 
@@ -114,7 +118,7 @@ export const updateTareasSemana = async (
 ) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprint/${idSprint}/semana/${idSemana}/tareas`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprint/${idSprint}/semana/${idSemana}/tareas`,
       {
         method: "PUT",
         headers: {
@@ -128,6 +132,7 @@ export const updateTareasSemana = async (
             fechaEntrega: task.fechaEntrega ?? null,
             deleted: task.deleted ?? false,
           })),
+          credentials: 'include'
         }),
       }
     );

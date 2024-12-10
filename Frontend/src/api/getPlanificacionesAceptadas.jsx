@@ -2,11 +2,12 @@
 export const getPlanificacionesAceptadas   = async () => {
   
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/planificacionAceptadas`, {
+      const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/planificacionAceptadas`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include'
       });
   
       if (!response.ok) {
@@ -20,3 +21,4 @@ export const getPlanificacionesAceptadas   = async () => {
       throw error;
     }
   };
+  

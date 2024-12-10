@@ -1,20 +1,21 @@
 import { Fragment, useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 import BaseUI from "../../../components/baseUI/baseUI";
 import { styled } from "@mui/material"; 
-import { Modal, TextField, Autocomplete, Snackbar, Alert, Grid2 } from "@mui/material";
+import { Modal, TextField, Autocomplete, Grid2 } from "@mui/material";
 import Box from '@mui/material/Box';
 import { Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from "@mui/icons-material/Add";
 import CuadroDialogo from "../../../components/cuadroDialogo/cuadroDialogo";
 import DecisionButtons from "../../../components/Buttons/decisionButtons";
+import InfoSnackbar from "../../../components/infoSnackbar/infoSnackbar";
+
 
 const ModificarGrupoEmpresa = () => {
     const [openValidateDialog, setOpenValidateDialog] = useState(false);
     const [openRejectDialog, setOpenRejectDialog] = useState(false);
-    const { idEstudiante } = useParams();
+    let idEstudiante = localStorage.getItem("idEstudiante")
     const [empresa, setEmpresa] = useState([]);
     const [integrantes, setIntegrantes] = useState([]);
     const [integrantesN, setIntegrantesN] = useState([]);
@@ -23,10 +24,14 @@ const ModificarGrupoEmpresa = () => {
     const [error, setError] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [selectedIntegrante, setSelectedIntegrante] = useState(null); 
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState("");
     const [isLoading, setLoading] = useState(true);
     const navigate = useNavigate(); 
+    const [snackbar, setSnackbar] = useState({
+        open: false,
+        message: "",
+        severity: "info",
+      });
+
 
     const irInicio = () => {
         navigate('/');  // Redirige a la página de inicio
@@ -35,7 +40,7 @@ const ModificarGrupoEmpresa = () => {
     useEffect(() => {
         const fetchInformacion = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/estudiante/getDatosEstEmpresa/${idEstudiante}`);
+                const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDatosEstEmpresa/${idEstudiante}`,{credentials: 'include'});
                 if (!response.ok) {
                     if (response.status === 404) {
                       setMensajeError("El estudiante no tiene empresa y no tiene registrada ninguna");
@@ -50,10 +55,10 @@ const ModificarGrupoEmpresa = () => {
                 setEmpresa({ idEmpresa, nombreEmpresa, nombreLargo, publicada });
                 setIntegrantes(integrantes);
                 if (publicada === 1) {
-                    // Si la empresa está publicada, mostrar el error 403 con el nombre de la empresa
+                    
                     setMensajeError(`La empresa "${nombreEmpresa}" ya ha sido publicada.`);
                     setError(true)
-                    return; // No seguir con la carga de los datos si la empresa está publicada
+                    return; 
                 }
     
                 setIdRepresentanteLegal(integrantes[0]?.idEstudiante);
@@ -69,7 +74,7 @@ const ModificarGrupoEmpresa = () => {
 
         const fetchNuevosEstudiantes = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/estudiante/getDisponibles/${idEstudiante}`);
+                const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDisponibles/${idEstudiante}`,{credentials: 'include'});
                 if (!response.ok) throw new Error('Error al recuperar datos');
     
                 const data = await response.json();
@@ -88,13 +93,17 @@ const ModificarGrupoEmpresa = () => {
 
     const actualizarIntegrantes = async () => {
         if (integrantes.length < 3) {
-            setMensajeError("Debe haber al menos 3 integrantes.");
+            setSnackbar({
+                open: true,
+                message: "Debe haber al menos 3 integrantes.",
+                severity: "error",
+              });
             return;
         }
 
         try {
             const estudiantesIds = integrantes.map(integrante => integrante.idEstudiante);
-            const response = await fetch(`http://localhost:8000/api/crearGrupoEmpresa/paso2/${empresa.idEmpresa}`, {
+            const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/crearGrupoEmpresa/paso2/${empresa.idEmpresa}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ integrantes: estudiantesIds }),
@@ -108,8 +117,11 @@ const ModificarGrupoEmpresa = () => {
             }
 
             const result = await response.json();
-            setSnackbarMessage(result.mensaje); 
-            setSnackbarOpen(true);
+            setSnackbar({
+                open: true,
+                message: (result.mensaje),
+                severity: "success",
+              });
 
         } catch (error) {
             console.error(error);
@@ -147,9 +159,11 @@ const ModificarGrupoEmpresa = () => {
 
             setSelectedIntegrante(null);
             setOpenModal(false);
-
-            setSnackbarMessage("Integrante agregado correctamente.");
-            setSnackbarOpen(true);
+            setSnackbar({
+                open: true,
+                message: "Integrante agregado correctamente.",
+                severity: "success",
+              });
 
         } else {
             setMensajeError("Debe seleccionar un integrante.");
@@ -171,9 +185,12 @@ const ModificarGrupoEmpresa = () => {
             });
             
             setIntegrantesN(nuevaListaIntegrantesN);
-    
-            setSnackbarMessage("Integrante restaurado correctamente.");
-            setSnackbarOpen(true);
+            setSnackbar({
+                open: true,
+                message: `Integrante restaurado correctamente.`,
+                severity: "info",
+                autoHide: 6000,
+            });
         }
     };
 
@@ -185,16 +202,16 @@ const ModificarGrupoEmpresa = () => {
         setOpenRejectDialog(true);
       };
       const rechazarModificacion = () => {
-        // Restaurar los integrantes al estado original (sin cambios)
-
+        setSnackbar({
+            open: true,
+            message: `La modificación ha sido rechazada. Los integrantes no fueron modificados.`,
+            severity: "info",
+            autoHide: 6000,
+        });
         setOpenRejectDialog(false);
         setTimeout(() => {
             irInicio();
         }, 2000); 
-
-        // Notificar que la modificación ha sido rechazada
-        console.log("La modificación ha sido rechazada. Los integrantes no fueron modificados.");
-        
     };
 
 
@@ -204,9 +221,9 @@ const ModificarGrupoEmpresa = () => {
                 titulo={`MODIFICAR GRUPO EMPRESA`}
                 ocultarAtras={false}
                 confirmarAtras={false}
-                dirBack={`/`}
+                dirBack={`/homeEstu`}
                 loading={isLoading}
-                error={mensajeError}
+                error={{error: error}}
             >
 
                 {isLoading !== true && (
@@ -337,16 +354,13 @@ const ModificarGrupoEmpresa = () => {
                             </div>
                         </div>
                     </Modal>
+                    <InfoSnackbar
+                        openSnackbar={snackbar.open}
+                        setOpenSnackbar={(open) => setSnackbar({ ...snackbar, open })}
+                        message={snackbar.message}
+                        severity={snackbar.severity}
+                    />
 
-                    <Snackbar 
-                        open={snackbarOpen} 
-                        autoHideDuration={3000} 
-                        onClose={() => setSnackbarOpen(false)}
-                    >
-                        <Alert onClose={() => setSnackbarOpen(false)} severity="success">
-                            {snackbarMessage}
-                        </Alert>
-                    </Snackbar>
                 </div>)}
             </BaseUI>
         </Fragment>

@@ -1,13 +1,13 @@
 import { Fragment, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import BaseUI from "../../../components/baseUI/baseUI";
 import { styled } from "@mui/material"; 
 import { Grid2 } from "@mui/material";
-import Box from '@mui/material/Box';
+import Box from '@mui/material/Box';;
 import { Button } from '@mui/material';
 import InfoSnackbar from '../../../components/infoSnackbar/infoSnackbar'
+import { useNavigate } from "react-router-dom";
 const PublicarGrupoEmpresa = () => {
-    const { idEstudiante } = useParams();
+    let idEstudiante = localStorage.getItem("idEstudiante")
     const [empresa, setEmpresa] = useState([]);
     const [integrantes, setIntegrantes] = useState([]);
     const [idRepresentanteLegal, setIdRepresentanteLegal] = useState(null);
@@ -19,10 +19,14 @@ const PublicarGrupoEmpresa = () => {
         message: "",
         severity: "info",
       });
+    const navigate = useNavigate();
+    const irInicio = () => {
+        navigate('/');  
+    };
     useEffect(() => {
         const fetchInformacion = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/estudiante/getDatosEstEmpresa/${idEstudiante}`);
+                const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDatosEstEmpresa/${idEstudiante}`,{credentials: 'include'});
                 if (!response.ok) {
                     if (response.status === 404) {
                         setSnackbar({
@@ -59,8 +63,11 @@ const PublicarGrupoEmpresa = () => {
                         severity: "info",
                         autoHide: 6000,
                     });    
-                    setMensajeError(`La empresa "${nombreEmpresa}" ya ha sido publicada.`);
-                    return; // No seguir con la carga de los datos si la empresa está publicada
+                    // setTimeout(() => {
+                    //     irInicio();
+                    // }, 2000); 
+                    return;
+                    
                 }
     
     
@@ -86,12 +93,24 @@ const PublicarGrupoEmpresa = () => {
     }, [idEstudiante]);
 
     const publicarIntegrantes = async () => {
+        console.log("hola");
+        if (integrantes.length < 2){
+            
+            setSnackbar({
+                open: true,
+                message: `Tiene que tener minimo 3 integrantes`,
+                severity: "warning",
+                autoHide: 6000,
+            });
+            return
+        }
         try {
-            const response = await fetch(`http://localhost:8000/api/crearGrupoEmpresa/paso3/${idEstudiante}`, {
+            const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/crearGrupoEmpresa/paso3/${idEstudiante}`, {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include'
             });
     
             if (!response.ok) {
@@ -100,10 +119,13 @@ const PublicarGrupoEmpresa = () => {
             }else{
                 setSnackbar({
                     open: true,
-                    message: `Se guardo los comentarios correctamente`,
+                    message: `Se creo correctamente`,
                     severity: "success",
                     autoHide: 6000,
                 });
+                setTimeout(() => {
+                    irInicio();
+                }, 2000); 
             }
     
         } catch (error) {
@@ -127,7 +149,7 @@ const PublicarGrupoEmpresa = () => {
                 titulo={`PUBLICAR GRUPO EMPRESA`}
                 ocultarAtras={false}
                 confirmarAtras={false}
-                dirBack={`/`}
+                dirBack={`/homeEstu`}
                 loading={isLoading}
                 error={error}
             >

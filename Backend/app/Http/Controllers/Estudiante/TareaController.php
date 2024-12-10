@@ -19,8 +19,11 @@ use App\Models\Empresa;
 use App\Models\Planificacion;
 class TareaController extends Controller
 {
-    public function obtenerTarea($idTarea)
+    public function obtenerTarea($idTarea, $idEmpresa)
     {
+        // Ensure $idEmpresa is an array
+        $idEmpresa = is_array($idEmpresa) ? $idEmpresa : [$idEmpresa];
+
         // Obtener la tarea
         $tarea = Tarea::find($idTarea);
 
@@ -35,37 +38,27 @@ class TareaController extends Controller
             ->where('tareasestudiantes.idTarea', $idTarea)
             ->get();
 
-        // Obtener el primer estudiante relacionado con la tarea (esto sería uno de los estudiantes que ya se ha recuperado)
-        $primerEstudiante = $estudiantes->first();
-
-        if ($primerEstudiante) {
-            // Obtener las empresas del primer estudiante
-            $empresasEstudiante = DB::table('estudiantesempresas')
-                ->where('idEstudiante', $primerEstudiante->idEstudiante)
-                ->pluck('idEmpresa');
-
-            // Obtener todos los estudiantes de las mismas empresas
-            $companerosDeEmpresa = DB::table('estudiante')
-                ->join('estudiantesempresas', 'estudiantesempresas.idEstudiante', '=', 'estudiante.idEstudiante')
-                ->whereIn('estudiantesempresas.idEmpresa', $empresasEstudiante)
-                ->where('estudiante.idEstudiante', '!=', $primerEstudiante->idEstudiante) // Excluir al primer estudiante
-                ->select('estudiante.idEstudiante', 'nombreEstudiante', 'primerApellido', 'segundoApellido')
-                ->get();
-        }
+        // Obtener todos los estudiantes de las mismas empresas
+        $companerosDeEmpresa = DB::table('estudiante')
+            ->join('estudiantesempresas', 'estudiantesempresas.idEstudiante', '=', 'estudiante.idEstudiante')
+            ->whereIn('estudiantesempresas.idEmpresa', $idEmpresa)
+            ->select('estudiante.idEstudiante', 'nombreEstudiante', 'primerApellido', 'segundoApellido')
+            ->get();
 
         // Formar la respuesta
         $respuesta = [
             'idSemana' => $tarea->idSemana,
             'nombreTarea' => $tarea->nombreTarea,
-            'comentario' => $tarea->comentario,
-            'textotarea' => $tarea->textoTarea,
-            'fechentregado' => $tarea->fechaEntrega,
+            'comentario' => $tarea->textoTarea,
+            'textoTarea' => $tarea->textoTarea,
+            'fechaEntrega' => $tarea->fechaEntrega,
             'estudiantes' => $estudiantes,
-            'integrantes' => $companerosDeEmpresa ?? [],
+            'integrantes' => $companerosDeEmpresa,
         ];
 
         return response()->json($respuesta);
     }
+
 
 
     //************************************ POSTS*************************** */
@@ -161,113 +154,83 @@ class TareaController extends Controller
         $resultado = DB::table('tarea as t');
         // ->join('semana as s','s.idSemana',)
     }
-
-    public function getTareasSemana($idEmpresa, $idSprint, $idSemana)
+    public function getTareasSemana($idEmpresa, $idSemana)
     {
         try {
-            // Realizar una única consulta uniendo las tablas necesarias
-            $tareas = Tarea::join('semana as s', 'tarea.idSemana', '=', 's.idSemana')
-                ->join('sprint as sp', 's.idSprint', '=', 'sp.idSprint')
-                ->join('planificacion as p', 'sp.idPlanificacion', '=', 'p.idPlanificacion')
-                ->join('empresa as emp', 'emp.idEmpresa', '=', 'p.idEmpresa')
-                ->where('emp.idEmpresa', $idEmpresa)
-                ->where('sp.numeroSprint', $idSprint)
-                ->where('s.numeroSemana', $idSemana)
-                ->select('tarea.*', 's.numeroSemana', 'sp.numeroSprint')
+            // Obtener los datos de la semana directamente
+            $semana = Semana::where('idSemana', $idSemana)->first();
+    
+            if (!$semana) {
+                return response()->json([
+                    'error' => 'Semana no encontrada.',
+                ], 404);
+            }
+    
+            // Obtener tareas asociadas a la semana
+            $tareas = Tarea::where('idSemana', $idSemana)
+                ->select('idTarea', 'nombreTarea', 'textoTarea', 'fechaEntrega')
                 ->get();
     
-            // Obtener el número de semana y número de sprint directamente de la consulta
-            $numeroSemana = $idSemana;
-            $numeroSprint = $idSprint;
-    
+            // Respuesta final
             return response()->json([
-                'numeroSemana' => $numeroSemana,
-                'numeroSprint' => $numeroSprint,
+                'idSemana' => $semana->idSemana,
+                'numeroSemana' => $semana->numeroSemana,
+                'fechaIni' => $semana->fechaIni,
+                'fechaFin' => $semana->fechaFin,
                 'tareas' => $tareas,
             ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al obtener las tareas: ' . $e->getMessage()], 500);
+    
+        } catch (\Throwable $e) {
+            // Manejo de errores
+            return response()->json([
+                'error' => 'Error al obtener los datos: ' . $e->getMessage(),
+            ], 500);
         }
     }
+    
+
+
     
 
     // Actualizar las tareas de una semana específica
     public function createOrUpdateTareas(Request $request)
-{
-    // Validar la solicitud
-    $validated = $request->validate([
-        'numeroSemana' => 'required|integer',
-        'numeroSprint' => 'required|integer',
-        'empresaID' => 'required|integer',
-        'tareas' => 'required|array',
-        'tareas.*.idTarea' => 'nullable|integer', // Permitir nulo para nuevas tareas
-        'tareas.*.nombreTarea' => 'required|string',
-        'tareas.*.textoTarea' => 'nullable|string',
-        'tareas.*.fechaEntrega' => 'nullable|date',
-    ]);
-
-    DB::beginTransaction();
-
-    try {
-        // Verificar si la empresa existe
-        $empresa = Empresa::find($validated['empresaID']);
-        if (!$empresa) {
-            throw new \Exception('Empresa no encontrada.');
+    {
+        // Validar la solicitud
+        $validated = $request->validate([
+            'idSemana' => 'required|integer',
+            'tareas' => 'required|array',
+            'tareas.*.idTarea' => 'nullable|integer', // Permitir nulo para nuevas tareas
+            'tareas.*.nombreTarea' => 'required|string',
+            'tareas.*.textoTarea' => 'nullable|string',
+            'tareas.*.fechaEntrega' => 'nullable|date',
+        ]);
+    
+        DB::beginTransaction();
+    
+        try {
+            // Insertar o actualizar en la tabla 'tarea'
+            foreach ($validated['tareas'] as $tareaData) {
+                Tarea::updateOrCreate(
+                    [
+                        'idTarea' => $tareaData['idTarea'] ?? null, // Permitir creación de nuevas tareas
+                        'idSemana' => $validated['idSemana'],
+                    ],
+                    [
+                        'nombreTarea' => $tareaData['nombreTarea'],
+                        'textoTarea' => $tareaData['textoTarea'] ?? null,
+                        'fechaEntrega' => $tareaData['fechaEntrega'] ?? null,
+                    ]
+                );
+            }
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Datos insertados o actualizados exitosamente'], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 400);
         }
-
-        // Insertar o actualizar en la tabla 'planificacion'
-        $planificacion = Planificacion::updateOrCreate(
-            ['idEmpresa' => $empresa->idEmpresa],
-            [
-                'idEmpresa' => $empresa->idEmpresa,
-                'aceptada' => 0, // Valor por defecto
-                'publicada' => 0, // Valor por defecto
-            ]
-        );
-
-        // Insertar o actualizar en la tabla 'sprint'
-        $sprint = Sprint::updateOrCreate(
-            ['numeroSprint' => $validated['numeroSprint'], 'idPlanificacion' => $planificacion->idPlanificacion],
-            [
-                'numeroSprint' => $validated['numeroSprint'],
-                'fechaInicio' => now(), // Asignar fecha actual como ejemplo
-                'fechaFin' => now()->addWeeks(2), // Ejemplo: 2 semanas después
-            ]
-        );
-
-        // Insertar o actualizar en la tabla 'semana'
-        $semana = Semana::updateOrCreate(
-            ['numeroSemana' => $validated['numeroSemana'], 'idSprint' => $sprint->idSprint],
-            [
-                'numeroSemana' => $validated['numeroSemana'],
-                'fechaInicio' => now()->startOfWeek(),
-                'fechaFin' => now()->endOfWeek(),
-            ]
-        );
-
-        // Insertar o actualizar en la tabla 'tarea'
-        foreach ($validated['tareas'] as $tareaData) {
-            Tarea::updateOrCreate(
-                [
-                    'idTarea' => $tareaData['idTarea'] ?? null, // Permitir creación de nuevas tareas
-                    'idSemana' => $semana->idSemana,
-                ],
-                [
-                    'nombreTarea' => $tareaData['nombreTarea'],
-                    'textoTarea' => $tareaData['textoTarea'] ?? null,
-                    'fechaEntrega' => $tareaData['fechaEntrega'] ?? null,
-                ]
-            );
-        }
-
-        DB::commit();
-
-        return response()->json(['message' => 'Datos insertados o actualizados exitosamente'], 201);
-    } catch (\Exception $e) {
-        DB::rollBack();
-        return response()->json(['error' => $e->getMessage()], 400);
     }
-}
 
 public function deleteTareas(Request $request)
 {
@@ -275,64 +238,19 @@ public function deleteTareas(Request $request)
     $validated = $request->validate([
         'tareas' => 'required|array',
         'tareas.*.idTarea' => 'required|integer', // Los IDs de las tareas son obligatorios
-        'numeroSemana' => 'required|integer',
-        'numeroSprint' => 'required|integer',
-        'idEmpresa' => 'required|integer',
     ]);
 
     DB::beginTransaction();
 
     try {
-        // Verificar si la empresa existe
-        $empresa = Empresa::find($validated['idEmpresa']);
-        if (!$empresa) {
-            throw new \Exception('Empresa no encontrada.');
-        }
-
-        // Buscar la planificación relacionada
-        $planificacion = Planificacion::where('idEmpresa', $empresa->idEmpresa)->first();
-        if (!$planificacion) {
-            throw new \Exception('No se encontró una planificación asociada a la empresa.');
-        }
-
-        // Buscar el sprint relacionado
-        $sprint = Sprint::where('numeroSprint', $validated['numeroSprint'])
-                        ->where('idPlanificacion', $planificacion->idPlanificacion)
-                        ->first();
-        if (!$sprint) {
-            throw new \Exception('No se encontró un sprint asociado a la planificación.');
-        }
-
-        // Buscar la semana relacionada
-        $semana = Semana::where('numeroSemana', $validated['numeroSemana'])
-                        ->where('idSprint', $sprint->idSprint)
-                        ->first();
-        if (!$semana) {
-            throw new \Exception('No se encontró una semana asociada al sprint.');
-        }
-
         // Eliminar tareas especificadas en el array
         foreach ($validated['tareas'] as $tareaData) {
             $tarea = Tarea::where('idTarea', $tareaData['idTarea'])
-                          ->where('idSemana', $semana->idSemana)
                           ->first();
             if (!$tarea) {
                 throw new \Exception("La tarea con ID {$tareaData['idTarea']} no se encontró en la semana especificada.");
             }
             $tarea->delete();
-        }
-
-        // Verificar si se deben eliminar semanas, sprints o planificación huérfanos
-        if (Tarea::where('idSemana', $semana->idSemana)->count() === 0) {
-            $semana->delete();
-        }
-
-        if (Semana::where('idSprint', $sprint->idSprint)->count() === 0) {
-            $sprint->delete();
-        }
-
-        if (Sprint::where('idPlanificacion', $planificacion->idPlanificacion)->count() === 0) {
-            $planificacion->delete();
         }
 
         DB::commit();

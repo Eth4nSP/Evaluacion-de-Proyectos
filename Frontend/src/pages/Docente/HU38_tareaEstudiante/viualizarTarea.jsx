@@ -1,4 +1,3 @@
-import { useParams} from "react-router-dom";
 import { Fragment,useEffect,useState } from 'react';
 import { styled } from '@mui/material';
 import BaseUI from '../../../components/baseUI/baseUI';
@@ -6,11 +5,10 @@ import {getTareaData} from "../../../api/validarTareas/tareas";// Ícono para ar
 
 function VisualizarTarea() {
     const [descripcion, setDescripcion] = useState("");
-    const [comentarioD, setComentario] = useState("");
     const [responsables, setResponsables] = useState([]);
     const [nombreTarea,setNombreTarea] = useState([]);
-    const { idTarea } = useParams();
-    const { idEmpresa, idGrupo } = useParams();
+    const idTarea = localStorage.getItem("idTarea")
+    const idEstudiante = localStorage.getItem("idEstudiante")
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState({
       error: false,
@@ -21,8 +19,7 @@ function VisualizarTarea() {
       const fetchTareaData = async () => {
         try {
           const data = await getTareaData(idTarea);
-          setDescripcion(data.textotarea);
-          setComentario(data.comentario);
+          setDescripcion(data.textoTarea);
           setResponsables(data.estudiantes);
           setNombreTarea(data.nombreTarea);
           setLoading(false);
@@ -48,7 +45,7 @@ function VisualizarTarea() {
             titulo = {'VISUALIZAR TAREA'}
             ocultarAtras = {false}
             confirmarAtras = {false}
-            dirBack = {`/homeGrupo/${idGrupo}/empresasVerTareas/${idEmpresa}`}
+            dirBack = {idEstudiante===null?`/homeDocente/listaEmpresasVerTareas/sprints`:`/homeEstu/listaSprintsSemanasTareas`}
             loading={loading}
             error={error}
           >
@@ -71,13 +68,6 @@ function VisualizarTarea() {
             </div>
             <h3>Descripcion de la tarea</h3>
             <Rectangulo>{descripcion}</Rectangulo>
-
-            {comentarioD && ( // Condición para mostrar el comentario solo si existe
-              <>
-                <h3>Comentario del Docente</h3>
-                <Rectangulo>{comentarioD}</Rectangulo>
-              </>
-            )}
           </BaseUI> 
         </Fragment>
     );

@@ -2,7 +2,7 @@
 
 use function PHPUnit\Framework\isTrue;
 
-return [
+//return [
 
     /*
     |--------------------------------------------------------------------------
@@ -17,11 +17,11 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie','web/*','grupo/*', 'session/*'],
+    /*'paths' => ['api/*', 'sanctum/csrf-cookie','web/*','grupo/*', 'session/*'],
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    'allowed_origins' => ['http://localhost:5173'],
 
     'allowed_origins_patterns' => [],
 
@@ -31,6 +31,18 @@ return [
 
     'max_age' => 0,
 
-    'supports_credentials' => false,
+    'supports_credentials' => true,
 
+];*/
+return [
+    'paths' => ['api/*', 'sanctum/csrf-cookie'],  // Asegúrate de permitir las rutas de la API y el CSRF cookie
+
+    'allowed_methods' => ['*'],  // Permitir todos los métodos HTTP
+
+    'allowed_origins' => ['http://localhost:5173'],  // Permite el origen de tu frontend en Vue.js
+
+    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'Accept', 'Origin', 'X-CSRF-TOKEN'],
+
+    //'allow_credentials' => true,
+    'supports_credentials' => true,  // Permite que las cookies se envíen
 ];

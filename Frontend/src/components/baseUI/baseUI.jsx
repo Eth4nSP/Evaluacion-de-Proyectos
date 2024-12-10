@@ -19,15 +19,11 @@ function BaseUI({ children, titulo, ocultarAtras, confirmarAtras, dirBack, loadi
           />
           <div className='pageBorder'>
             <div className='pageBorder_interior'>
-              {error.error?
-                <Error errorMessage={error?.errorMenssange} errorDetails={error?.errorDetails}></Error>
-                :
-                (loading?
-                  <Loading></Loading>  
-                  :
-                  children
-                )
-              }
+            {error.error ? (
+              <Error errorMessage={error.errorMessage} errorDetails={error.errorDetails}/>
+            ) : (
+              loading ? <Loading /> : children
+            )}
             </div>
           </div>
         </div>

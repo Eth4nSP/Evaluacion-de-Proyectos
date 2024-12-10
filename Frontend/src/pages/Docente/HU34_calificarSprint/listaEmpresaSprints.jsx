@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPlanificacionesAceptadas } from '../../../api/getPlanificacionesAceptadas';
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN';
-import { useParams } from 'react-router-dom';
 import BaseUI from '../../../components/baseUI/baseUI';
 const columns = [
     {
@@ -19,7 +17,6 @@ const columns = [
   ];
 
 function ListaEmpresaSprints() {
-    const { idGrupo } = useParams()
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState({
         error:false,
@@ -30,9 +27,20 @@ function ListaEmpresaSprints() {
     useEffect(() => {
         const fetchData = async () => {
           try {
-            const [lista] = await Promise.all([getPlanificacionesAceptadas()]);
-            setListaEmpresas(lista);
-            console.log(lista);
+            const url = 'http://creativeharbor.tis.cs.umss.edu.bo/api/empresasSinSprintCalificado'
+            const body = {
+              method: 'GET',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              credentials: 'include'
+            }
+            const response = await fetch(url, body)
+            if(response.ok){
+              const lista = await response.json()  
+              setListaEmpresas(lista);
+              console.log(lista);
+            }
           } catch (error) {
             console.error("Error en la solicitud:", error.message);
             setError({
@@ -51,7 +59,7 @@ function ListaEmpresaSprints() {
         titulo={'SELECCIONE UNA EMPRESA PARA CALIFICAR'}
         ocultarAtras={false}
         confirmarAtras={false}
-        dirBack={`/homeGrupo/${idGrupo}/listaEmpresaCalificarSprints/`}
+        dirBack={`/homeDocente`}
         loading={loading}
         error={error}
     >
@@ -70,8 +78,8 @@ function ListaEmpresaSprints() {
       datosTabla={listaEmpresas}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack={`/`}
-      dirForward= {`/homeGrupo/${idGrupo}/listaEmpresaCalificarSprints/`}
+      dirBack={`/homeDocente`}
+      dirForward= {`/homeDocente/listaEmpresaCalificarSprints/empresa`}
       mensajeSearch = "Buscar empresa"
       nombreContador = "Empresas"
     />

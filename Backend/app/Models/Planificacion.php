@@ -26,4 +26,10 @@ class Planificacion extends Model
     {
         return $this->hasMany(Sprint::class, 'idPlanificacion');
     }
+
+    public function semanas()
+    {
+        return $this->hasMany(Semana::class, 'idPlanificacion');
+    }
+
 }

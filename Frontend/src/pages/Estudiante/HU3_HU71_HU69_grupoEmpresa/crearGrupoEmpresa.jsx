@@ -1,23 +1,21 @@
 import { Fragment, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import BaseUI from "../../../components/baseUI/baseUI";
 import { styled } from "@mui/material";
-import { Snackbar, Alert } from "@mui/material";
+import { Alert } from "@mui/material";
 import Box from "@mui/material/Box";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import Loading from "../../../components/loading/loading";
 import Error from "../../../components/error/error";
+import InfoSnackbar from "../../../components/infoSnackbar/infoSnackbar";
 
 const CrearGrupoEmpresa = () => {
-  let { idEstudiante } = useParams();
+  let idEstudiante = localStorage.getItem("idEstudiante")
   const [nombreLargo, setNombreLargo] = useState("");
   const [nombreCorto, setNombreCorto] = useState("");
   const [intentoEnviar, setIntentoEnviar] = useState(false);
   const [estudiante, setEstudiante] = useState({});
   const [mensajeError, setMensajeError] = useState("");
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [isLoading, setLoading] = useState(true);
   const [error, setError] = useState({
     error:false,
@@ -25,12 +23,17 @@ const CrearGrupoEmpresa = () => {
     errorDetails: "",
   });
   const navigate = useNavigate();
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   useEffect(() => {
     const fetchEstudiante = async (idEstudiante) => {
       try {
         const response = await fetch(
-          `http://localhost:8000/api/estudiante/getDatosEst/${idEstudiante}`
+          `http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDatosEst/${idEstudiante}`,{credentials: 'include'}
         );
         if (!response.ok) throw new Error("Error al recuperar estudiante");
         const data = await response.json();
@@ -58,7 +61,7 @@ const CrearGrupoEmpresa = () => {
     if (nombreLargo && nombreCorto && estudiante.idEstudiante) {
       try {
         const response = await fetch(
-          "http://localhost:8000/api/crearGrupoEmpresa/paso1",
+          "http://creativeharbor.tis.cs.umss.edu.bo/api/crearGrupoEmpresa/paso1",
           {
             method: "POST",
             headers: {
@@ -69,50 +72,71 @@ const CrearGrupoEmpresa = () => {
               nombreCorto,
               estudiante: estudiante.idEstudiante,
             }),
+            credentials: "include",
           }
         );
-
+  
         if (!response.ok) {
           const errorData = await response.json();
-          if (
-            errorData.message === "Ya existe una empresa con ese nombre largo."
-          ) {
-            setMensajeError(
-              "El nombre largo de la empresa ya está en uso. Elige otro nombre."
-            );
+          if (errorData.message === "Ya existe una empresa con ese nombre largo.") {
+            setSnackbar({
+              open: true,
+              message: "El nombre largo de la empresa ya está en uso. Elige otro nombre.",
+              severity: "error",
+            });
+          } else if (errorData.message === "Ya existe una empresa con ese nombre corto.") {
+            setSnackbar({
+              open: true,
+              message: "El nombre corto de la empresa ya está en uso. Elige otro nombre.",
+              severity: "error",
+            });
           } else if (
-            errorData.message === "Ya existe una empresa con ese nombre corto."
+            errorData.message === "El estudiante ya está asociado a otra empresa"
           ) {
-            setMensajeError(
-              "El nombre corto de la empresa ya está en uso. Elige otro nombre."
-            );
-          } else if (
-            errorData.message ===
-            "El estudiante ya está asociado a otra empresa"
-          ) {
-            setMensajeError("El estudiante ya pertenece a otra empresa.");
+            setSnackbar({
+              open: true,
+              message: "El estudiante ya pertenece a otra empresa.",
+              severity: "error",
+            });
           } else {
-            setMensajeError("Error al crear el grupo.");
+            setSnackbar({
+              open: true,
+              message: "Error al crear el grupo",
+              severity: "error",
+            });
           }
           return;
         }
-
+  
         const result = await response.json();
         console.log("Grupo creado con éxito:", result);
-        setSnackbarMessage("¡Grupo creado con éxito!");
-        setSnackbarOpen(true);
-
+  
+        setSnackbar({
+          open: true,
+          message: "¡Grupo creado con éxito!",
+          severity: "success",
+        });
+  
         setTimeout(() => {
           navigate("/");
         }, 2000);
       } catch (error) {
         console.error(error);
-        setMensajeError("Error al crear el grupo.");
+        setSnackbar({
+          open: true,
+          message: "Error al crear el grupo",
+          severity: "error",
+        });
       }
     } else {
-      setMensajeError("Debe completar todos los campos.");
+      setSnackbar({
+        open: true,
+        message: "Por favor, completa todos los campos",
+        severity: "error",
+      });
     }
   };
+  
 
   return (
     <Fragment>
@@ -120,7 +144,7 @@ const CrearGrupoEmpresa = () => {
         titulo={`REGISTRAR GRUPO EMPRESA`}
         ocultarAtras={false}
         confirmarAtras={false}
-        dirBack={`/`}
+        dirBack={`/homeEstu`}
         loading={isLoading}
         error={error}
       >
@@ -242,20 +266,12 @@ const CrearGrupoEmpresa = () => {
                     CREAR
                   </Button>
                 </div>
-
-                <Snackbar
-                  open={snackbarOpen}
-                  autoHideDuration={2000}
-                  onClose={() => setSnackbarOpen(false)}
-                  anchorOrigin={{ vertical: "bottom", horizontal: "center" }} // Centrar horizontalmente
-                >
-                  <Alert
-                    onClose={() => setSnackbarOpen(false)}
-                    severity="success"
-                  >
-                    {snackbarMessage}
-                  </Alert>
-                </Snackbar>
+                <InfoSnackbar
+                        openSnackbar={snackbar.open}
+                        setOpenSnackbar={(open) => setSnackbar({ ...snackbar, open })}
+                        message={snackbar.message}
+                        severity={snackbar.severity}
+                    />
               </div>
             )}
           </div>

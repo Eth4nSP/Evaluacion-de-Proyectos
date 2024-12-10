@@ -14,10 +14,11 @@ class TareaSeeder extends Seeder
     public function run(): void
     {
         $semanas = DB::table('semana')
-            ->join('sprint', 'semana.idSprint', '=', 'sprint.idSprint')
-            ->whereIn('sprint.idPlanificacion', [1, 2])
+            ->join('planificacion', 'semana.idPlanificacion', '=', 'planificacion.idPlanificacion') // Directamente entre Semana y Planificacion
+            ->whereIn('planificacion.idPlanificacion', [1, 2])  // Filtro de Planificación
             ->select('semana.*')
             ->get();
+
 
         $tareas = [
             [

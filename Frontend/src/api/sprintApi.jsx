@@ -1,12 +1,13 @@
 export const getSprintSemanas = async (idSprint) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/estudiante/sprint/semana/${idSprint}`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/sprint/semana/${idSprint}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 
@@ -25,7 +26,7 @@ export const getSprintSemanas = async (idSprint) => {
 export const actualizarSprint = async (idSprint, comentario, nota) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/sprint/${idSprint}/actualizar`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/sprint/${idSprint}/actualizar`,
       {
         method: "POST",
         headers: {
@@ -35,6 +36,7 @@ export const actualizarSprint = async (idSprint, comentario, nota) => {
           comentario,
           nota,
         }),
+        credentials: 'include'
       }
     );
 
@@ -50,15 +52,42 @@ export const actualizarSprint = async (idSprint, comentario, nota) => {
   }
 };
 
+export const aceptarEntregables = async (aceptados) => {
+  try {
+    const response = await fetch(
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/aceptarEntregables`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          entregables: aceptados
+        }),
+        credentials: 'include'
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Error al actualizar el sprint");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en la solicitud:", error);
+    throw error;
+  }
+};
+
 export const getSprintSemanasTareas = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprintsSemanasTareas`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprintsSemanasTareas`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 

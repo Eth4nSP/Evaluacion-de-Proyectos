@@ -1,6 +1,6 @@
 import ListaDefinitivaN from "../../../../components/listaDefinitiva/listaDefinitivaN";
 import { useEffect, useState } from "react";
-import { getPlanificacionesSinPublicar } from "../../../../api/listas/listasEmpresas";
+import { getPlanificacionesParaModificar} from "../../../../api/listas/listasEmpresas";
 
 const columns = [
   {
@@ -26,7 +26,7 @@ function SeleccionarEmpresaModificar() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const responseData = await Promise.all([getPlanificacionesSinPublicar()]);
+      const responseData = await getPlanificacionesParaModificar();
         console.log(responseData);
       if (responseData.error !== undefined && responseData.error !== null) {
         setError({

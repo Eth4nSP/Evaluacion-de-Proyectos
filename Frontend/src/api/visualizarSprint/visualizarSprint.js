@@ -1,5 +1,5 @@
 // definir la url inicial de la api
-const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'http://creativeharbor.tis.cs.umss.edu.bo/api';
 
 /**
  * Obtiene los datos de un sprint específico por su ID
@@ -7,25 +7,26 @@ const BASE_URL = 'http://localhost:8000/api';
  * @returns {Promise<Object>} Los datos del sprint
  */
 export async function getSprintPorId(idSprint) {
-  try {
-    const response = await fetch(`${BASE_URL}/getSprintPorId?idSprint=${idSprint}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+        const response = await fetch(`${BASE_URL}/getSprintPorId?idSprint=${idSprint}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al obtener los datos del sprint');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al obtener los datos del sprint');
+        }
+
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        console.error('Error en la API getSprintPorId:', error);
+        throw error;
     }
-
-    const data = await response.json();
-    return data.data; 
-  } catch (error) {
-    console.error('Error en la API getSprintPorId:', error);
-    throw error;
-  }
 }
 
 /**
@@ -34,23 +35,24 @@ export async function getSprintPorId(idSprint) {
  * @returns {Promise<Array>} Lista de sprints de la empresa
  */
 export async function getListaSprintsPorIdEmpresa(idEmpresa) {
-  try {
-    const response = await fetch(`${BASE_URL}/getListaSprintsPorIdEmpresa?idEmpresa=${idEmpresa}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    try {
+        const response = await fetch(`${BASE_URL}/getListaSprintsPorIdEmpresa?idEmpresa=${idEmpresa}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include'
+        });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Error al obtener la lista de sprints');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al obtener la lista de sprints');
+        }
+
+        const data = await response.json();
+        return data.data;
+    } catch (error) {
+        console.error('Error en la API getListaSprintsPorIdEmpresa:', error);
+        throw error;
     }
-
-    const data = await response.json();
-    return data.data;
-  } catch (error) {
-    console.error('Error en la API getListaSprintsPorIdEmpresa:', error);
-    throw error;
-  }
 }

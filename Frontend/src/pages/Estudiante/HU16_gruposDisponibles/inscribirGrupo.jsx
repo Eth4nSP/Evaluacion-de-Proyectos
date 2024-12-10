@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import BaseUI from '../../../components/baseUI/baseUI.jsx';
 import { styled, Box, Button, Stack, Snackbar } from '@mui/material';
@@ -11,7 +10,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
 
 const getGrupoDescripcion = async (idGrupo) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/estudiante/descripcionGrupo/${idGrupo}`);
+    const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/descripcionGrupo/${idGrupo}`, {credentials: 'include'});
     if (!response.ok) {
       throw new Error('Error al obtener la descripción');
     }
@@ -24,12 +23,13 @@ const getGrupoDescripcion = async (idGrupo) => {
 
 const enviarClave = async (idGrupo, clave, idEstudiante) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/estudiante/asignarEstudiante`, {
+    const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/asignarEstudiante`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ idGrupo, clave, idEstudiante }),
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -44,7 +44,8 @@ const enviarClave = async (idGrupo, clave, idEstudiante) => {
 
 
 function GrupoDescripcion() {
-  const { idGrupo,idEstudiante } = useParams();
+  const idGrupo = localStorage.getItem("idGrupoQuieroInscribirme")
+  const idEstudiante = localStorage.getItem("idEstudiante")
   const [codigo, setCodigo] = useState('');
   const [datos, setDatos] = useState(null); 
   const [error, setError] = useState(false);
@@ -88,6 +89,7 @@ function GrupoDescripcion() {
           }, 2500);
         }       
       } catch (error) {
+        console.log(error)
         setSnackbar({ open: true, message: 'Error al matricularse', severity: 'error' });
       }
   };
@@ -102,7 +104,7 @@ function GrupoDescripcion() {
 
 
   return (
-    <BaseUI titulo="MATRICULARSE CON UN DOCENTE" ocultarAtras={false} confirmarAtras={true} dirBack={`/homeEstudiante/gruposDisponibles/${idEstudiante}`}error={{error:error}}>
+    <BaseUI titulo="MATRICULARSE CON UN DOCENTE" ocultarAtras={false} confirmarAtras={true} dirBack={`/GruposDocente`}error={{error:error}} loading={loading}>
       <Box component="section" sx={{ p: 2, pb: 0, border: '1p' }}>
         <h1 style={{ fontSize: '25px' }}>
           {datos?.apellidoPaternoDocente} {datos?.apellidoMaternoDocente} {datos?.nombreDocente} G{datos?.numGrupo}

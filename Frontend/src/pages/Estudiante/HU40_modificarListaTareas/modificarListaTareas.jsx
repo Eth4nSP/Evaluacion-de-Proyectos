@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -18,14 +17,16 @@ import InfoSnackbar from "../../../components/infoSnackbar/infoSnackbar.jsx";
 import {
   getTareasSemana,
 } from "../../../api/validarTareas/tareas.jsx";
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 
 export default function ModificarListaTareas() {
-  const { idEmpresa, idSprint, idSemana } = useParams();
+  const idEmpresa = localStorage.getItem("idEmpresa")
+  const idSemana = localStorage.getItem("idSemana")
   const [tasks, setTasks] = useState([]);
   const [tasksEliminadas, setTasksEliminadas] = useState([]);
   const [numSemana, setNumSemana] = useState(0);
-  const [numSprint, setNumSprint] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [fechas, setFechas] = useState({});
   const [error, setError] = useState(false);
   const [errorTexto, setErrorTexto] = useState([]);
   const [snackbar, setSnackbar] = useState({
@@ -42,13 +43,16 @@ export default function ModificarListaTareas() {
 
   const fetchTasks = async () => {
     try {
-      const tareas = await getTareasSemana(idEmpresa, idSprint, idSemana);
+      const tareas = await getTareasSemana(idEmpresa, idSemana);
+      console.log(tareas)
       setNumSemana(tareas.numeroSemana);
-      setNumSprint(tareas.numeroSprint);
       setTasks(tareas.tareas);
+      const fechasNuevas = {fechaIni: tareas.fechaIni, fechaFin: tareas.fechaFin}
+      setFechas(fechasNuevas)
       const tareasV = tareas.tareas
       const newTextos = tareasV.map(()=>false)
       setErrorTexto(newTextos)
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching tasks:", error);
       setError("Error al obtener las tareas de la semana");
@@ -57,9 +61,7 @@ export default function ModificarListaTareas() {
         message: "Error al cargar las tareas",
         severity: "error",
       });
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   useEffect(() => {
@@ -147,18 +149,17 @@ export default function ModificarListaTareas() {
     }
     try {
       const response = await fetch(
-        `http://localhost:8000/api/estudiante/crearListaTareas`,
+        `http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/crearListaTareas`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            numeroSemana: Number(idSemana),
-            numeroSprint:Number(idSprint),
-            empresaID:Number(idEmpresa),
+            idSemana: Number(idSemana),
             tareas: tasks
           }),
+          credentials:'include'
         }
       );
   
@@ -175,20 +176,19 @@ export default function ModificarListaTareas() {
       });
     }
     if(tasksEliminadas.length > 0){
+      console.log(tasksEliminadas)
       try {
         const response = await fetch(
-          `http://localhost:8000/api/estudiante/eliminarTareas`,
+          `http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/eliminarTareas`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              numeroSemana: Number(idSemana),
-              numeroSprint:Number(idSprint),
-              idEmpresa:Number(idEmpresa),
               tareas: tasksEliminadas
             }),
+            credentials:'include'
           }
         );
     
@@ -212,7 +212,7 @@ export default function ModificarListaTareas() {
       titulo="MODIFICAR LISTA SEMANAL DE TAREAS"
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack="/"
+      dirBack="/homeEstu"
       loading={loading}
       error={error}
     >
@@ -224,17 +224,24 @@ export default function ModificarListaTareas() {
             align="center"
             sx={{ fontWeight: "bold" }}
           >
-            SPRINT {numSprint}
-          </Typography>
-          <Typography
-            variant="h5"
-            component="h2"
-            gutterBottom
-            align="center"
-            sx={{ mb: 3 }}
-          >
             SEMANA {numSemana}
           </Typography>
+          <Box display="flex" justifyContent="center" flexWrap={'wrap'}>
+              <Box display="flex" alignItems="center" m={2}>
+                <CalendarTodayIcon sx={{ mr: 1 }} />
+                <Typography variant="body1">
+                  <strong>Fecha de Inicio:</strong>
+                  {fechas.fechaIni} a las 00:00
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center" m={2}>
+                <CalendarTodayIcon sx={{ mr: 1 }} />
+                <Typography variant="body1">
+                  <strong>Fecha de Fin:</strong>{" "}
+                  {fechas.fechaFin} a las 23:59
+                </Typography>
+              </Box>
+          </Box>
           {tasks.length === 0 ? (
             <Typography variant="h4" align="center" sx={{ mb: 5.4, mt: 6 }}>
               No hay tareas aún
@@ -285,17 +292,17 @@ export default function ModificarListaTareas() {
                           error={errorTexto[index]}
                           helperText={errorTexto[index] && 'No tiene que ser un nombre similar'}
                         />
+                        
+                        <Button
+                          variant="contained"
+                          color="secondary"
+                          startIcon={<DeleteIcon />}
+                          onClick={() => handleDeleteTask(index)}
+                          sx={{ ml: 2, fontSize:'calc(1vw + 0.1rem)' }}
+                        >
+                          Eliminar
+                        </Button>
                       </Box>
-                      
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        startIcon={<DeleteIcon />}
-                        onClick={() => handleDeleteTask(index)}
-                        sx={{ ml: 2 }}
-                      >
-                        Eliminar
-                      </Button>
                     </ListItem>
                     </>
                   )

@@ -30,6 +30,7 @@ function PlanificacionDeDesarollo() {
         ]);
         setEmpresaData(empresa);
         setPlanificacionData(planificacion);
+        console.log(planificacion)
       } catch (error) {
         console.error("Error en la solicitud:", error.message);
         setError({

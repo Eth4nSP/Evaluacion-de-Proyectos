@@ -17,8 +17,8 @@ return new class extends Migration
             $table->text('descripcionEntregable');
             $table->string('nombreArchivo',30)->nullable()->default(null);
             $table->longText('archivoEntregable')->nullable()->default(null);
+            $table->boolean('aceptado')->nullable();
             $table->dateTime('fechaEntrega')->nullable();
-            
             // * Llave foranea idSprint
             $table->foreign('idSprint')
                 ->references('idSprint')

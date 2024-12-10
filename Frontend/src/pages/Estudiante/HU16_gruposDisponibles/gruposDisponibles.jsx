@@ -6,11 +6,12 @@ import { Box, styled } from "@mui/material";
 
 const getGruposDocentes = async () => {
   try {
-    const response = await fetch("http://127.0.0.1:8000/api/estudiante/gruposDocente", {
+    const response = await fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/gruposDocente", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: 'include'
     });
 
     if (response.status === 200) {
@@ -30,11 +31,12 @@ const getGruposDocentes = async () => {
 
 const estaMatriculado = async (idEstudiante) => {
   try {
-    const response = await fetch(`http://127.0.0.1:8000/api/estaMatriculado/${idEstudiante}`, {
+    const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estaMatriculado/${idEstudiante}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
+      credentials: 'include'
     });
 
     const data = await response.json();
@@ -75,7 +77,8 @@ function GruposDocentes() {
   }, [idEstudiante]);
 
   const handleMatricularse = (grupo) => {
-    const url = `/homeEstudiante/inscribirGrupo/${idEstudiante}/${grupo.idGrupo}`; 
+    localStorage.setItem("idGrupoQuieroInscribirme", grupo.idGrupo)
+    const url = `/GruposDocente/incribirse`; 
     navigate(url); 
   };
 
@@ -85,7 +88,7 @@ function GruposDocentes() {
     <Fragment>
       <BaseUI
         titulo={`SELECCIONAR UN DOCENTE PARA MATRICULARSE`}
-        ocultarAtras={false}
+        ocultarAtras={true}
         confirmarAtras={false}
         dirBack={`/`}
         loading={loading}

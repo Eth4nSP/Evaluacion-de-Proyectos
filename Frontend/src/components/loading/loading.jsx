@@ -6,6 +6,7 @@ export default function Loading() {
     <>
       <Box
         sx={{
+          height:'98vh',
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
