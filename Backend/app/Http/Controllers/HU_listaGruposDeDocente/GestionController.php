@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\NuevaHUDeploy;
+namespace App\Http\Controllers\HU_listaGruposDeDocente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +25,7 @@ class GestionController extends Controller{
         ->join('docente as d', 'g.idDocente','=','g.idDocente')
         ->select('g.gestionGrupo')
         ->where('d.idDocente',$idDocente)
+        ->distinct()
         ->get();
         
 
