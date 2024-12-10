@@ -11,7 +11,7 @@ class GestionController extends Controller{
         $result = DB::table('grupo as g')
         ->join('estudiantesgrupos as eg', 'g.idGrupo','=','eg.idGrupo')
         ->join('estudiante as e','eg.idEstudiante','=','e.idEstudiante')
-        ->select('g.gestionGrupo')
+        ->select('g.idGrupo as id','g.gestionGrupo')
         ->where('e.idEstudiante',$idEstudiante)
         ->get();
         
@@ -22,10 +22,9 @@ class GestionController extends Controller{
     public function visualizarSemestresDocente(){
         $idDocente = session('docente.id');
         $result = DB::table('grupo as g')
-        ->join('docente as d', 'g.idDocente','=','g.idDocente')
-        ->select('g.gestionGrupo')
+        ->join('docente as d', 'g.idDocente','=','d.idDocente')
+        ->select('g.idGrupo as id','g.gestionGrupo')
         ->where('d.idDocente',$idDocente)
-        ->distinct()
         ->get();
         
 
