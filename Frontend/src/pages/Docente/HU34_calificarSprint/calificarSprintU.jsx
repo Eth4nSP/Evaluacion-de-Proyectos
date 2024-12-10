@@ -5,27 +5,24 @@ import {
   Checkbox,
   TextField,
   Paper,
-  Grid,
   Link,
   FormControl,
   Grid2,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import BaseUI from "../../../components/baseUI/baseUI";
-
 import DescriptionIcon from "@mui/icons-material/Description";
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import PhotoIcon from "@mui/icons-material/Photo";
 import FolderZipIcon from "@mui/icons-material/FolderZip";
-
+import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import DecisionButtons from "../../../components/Buttons/decisionButtons";
 import InfoSnackbar from "../../../components/infoSnackbar/infoSnackbar";
 import CuadroDialogo from "../../../components/cuadroDialogo/cuadroDialogo";
-import { useParams } from "react-router-dom";
 import Loading from "../../../components/loading/loading";
 import Error from "../../../components/error/error";
-import { getSprintsEntregables } from "../../../api/getEmpresa";
-import { actualizarSprint } from "../../../api/sprintApi";
+import { getSprintConEntregables } from "../../../api/getEmpresa";
+import { actualizarSprint, aceptarEntregables } from "../../../api/sprintApi";
 
 const FileItem = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -38,8 +35,8 @@ const FileInfo = styled(Box)(({ theme }) => ({
 }));
 
 function CalificarSprintU() {
-  const { idEmpresa, idSprint, idGrupo } = useParams();
-  const [sprints, setSprints] = useState([]);
+  const idSprint = localStorage.getItem("idSprint")
+  const [tieneNota, setTieneNota] = useState(false);
   const [datosSprint, setDatosSprint] = useState({
     idSprint: "2",
     numeroSprint: 2,
@@ -58,7 +55,7 @@ function CalificarSprintU() {
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
-    severity: "info",
+    severity: "info", 
     autoHide: 6000,
   });
   const [cuadroDialogo, setCuadroDialogo] = useState({
@@ -73,40 +70,38 @@ function CalificarSprintU() {
     errorMessage: "",
     errorDetails: "",
   });
-
+  const [aceptados, setAceptados] = useState([]);
+  const fetchSprints = async () => {
+    try {
+      const sprintData = await getSprintConEntregables(idSprint)
+      const newSprint = sprintData.sprints
+      setDatosSprint(newSprint);
+      console.log(newSprint)
+      const nota = newSprint.nota;
+      const aceptadosResponse = newSprint.entregables.map((entregable)=> {
+        const esAceptado = entregable.aceptado !== null? entregable.aceptado:false;
+        return esAceptado
+      })
+      setAceptados(aceptadosResponse)
+      setTieneNota(nota!==null);
+      setNotaSprint(nota === null ? "" : nota);
+      const comentarioNew = newSprint.comentario
+        ? newSprint.comentario
+        : "";
+      setComentario(comentarioNew);
+    } catch (error) {
+      setError({
+        error: true,
+        errorMessage: "Ha ocurrido un error",
+        errorDetails: error.message,
+      });
+      console.error("Error al cargar la tarea:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchSprints = async () => {
-      try {
-        const [sprintData] = await Promise.all([
-          getSprintsEntregables(idEmpresa),
-        ]);
-        console.log(sprintData.sprints);
-        const newSprints = sprintData.sprints;
-        setSprints(newSprints);
-        const newSprint = newSprints.filter((sprint) => {
-          const es = sprint.idSprint === Number(idSprint);
-          console.log(es);
-          return es;
-        });
-        console.log(...newSprint);
-        setDatosSprint(...newSprint);
-        const nota = newSprint[0].nota;
-        setNotaSprint(nota === null ? "" : nota);
-        const comentarioNew = newSprint[0].comentario
-          ? newSprint[0].comentario
-          : "";
-        setComentario(comentarioNew);
-      } catch (error) {
-        setError({
-          error: true,
-          errorMessage: "Ha ocurrido un error",
-          errorDetails: error.message,
-        });
-        console.error("Error al cargar la tarea:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    
     fetchSprints();
   }, []);
   const handleComentarioChange = (event) => {
@@ -117,6 +112,7 @@ function CalificarSprintU() {
   };
   const handleNotaChange = (event) => {
     const value = event.target.value;
+    setErrorNota(value === '')
     if (!isNaN(value) && Number(value) <= 100 && Number(value) >= 0) {
       setNotaSprint(value);
     }
@@ -139,26 +135,60 @@ function CalificarSprintU() {
       onConfirm: handleSubmit,
     });
   };
+  const [errorNota, setErrorNota] = useState(false);
   const handleSubmit = async () => {
     if (comentario === "" && comentario.length < 20) {
       setError(true);
       return;
     }
+    if (notaSprint === '') {
+      setErrorNota(true)
+      return;
+    }
     try {
       const response = await actualizarSprint(idSprint, comentario, notaSprint);
-      if (response) {
-        setSnackbar({
-          open: true,
-          message: "Se subió correctamente todo",
-          severity: "success",
-          autoHide: 6000,
-        });
-      }
+      console.log("subir nota y comentario"+response.ok)
     } catch (error) {
-      console.error("Error al actualizar la tarea:", error);
+      console.error("Error al actualizar calificar sprint:", error);
       setSnackbar({
         open: true,
-        message: `Hubo un error al momento de subir, error: ${error}`,
+        message: `Hubo un error al momento de subir las calificaciones, error: ${error}`,
+        severity: "error",
+        autoHide: 60000,
+      });
+    }
+    try {
+      const aceptadosNew = aceptados
+        .map((aceptado, index) => {
+          if (aceptado && datosSprint?.entregables[index]?.idEntregables) {
+            return { idEntregable: Number(datosSprint.entregables[index].idEntregables) };
+          }
+          return null;
+        })
+        .filter(item => item !== null);
+      console.log(aceptadosNew)
+      if(aceptadosNew.length > 0){
+        
+        const response = await aceptarEntregables(aceptadosNew);
+        console.log("check aceptados"+response.ok)
+      }
+      setSnackbar({
+        open: true,
+        message: "Se subió correctamente todo",
+        severity: "success",
+        autoHide: 6000,
+      });
+      fetchSprints();   
+      setCuadroDialogo({
+        open: false,
+        onConfirm: () => {},
+        title: "",
+        description: "",
+      });
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: `Hubo un error al momento de subir chekeo entragables, error: ${error}`,
         severity: "error",
         autoHide: 60000,
       });
@@ -199,25 +229,85 @@ function CalificarSprintU() {
       );
     }
   };
-  if (loading) return <Loading></Loading>;
-  if (error.error) return <Error></Error>;
+  const handleAceptado = (index)=>{
+    const newAceptados = aceptados.map((aceptado, i)=>{
+      if(index === i){
+        return !aceptado
+      }else{
+        return aceptado
+      }
+    })
+    setAceptados(newAceptados)
+  }
+  if (loading) return (
+    <BaseUI
+      titulo={"CALIFICAR SPRINT"}
+      ocultarAtras={false}
+      confirmarAtras={true}
+      dirBack={`/homeDocente/listaEmpresaCalificarSprints/empresa`}
+      loading={loading}
+      error={error}
+    >
+      <Loading></Loading>  
+    </BaseUI>
+  )
+  if (error.error) return(
+    <BaseUI
+      titulo={"CALIFICAR SPRINT"}
+      ocultarAtras={false}
+      confirmarAtras={true}
+      dirBack={`/homeDocente/listaEmpresaCalificarSprints/empresa`}
+      loading={loading}
+      error={error}
+    >
+      <Error></Error>;
+    </BaseUI>
+  )
+  
   return (
     <BaseUI
       titulo={"CALIFICAR SPRINT"}
       ocultarAtras={false}
       confirmarAtras={true}
-      dirBack={`/homeGrupo/${idGrupo}/listaEmpresaCalificarSprints/${idEmpresa}`}
+      dirBack={`/homeDocente/listaEmpresaCalificarSprints/empresa`}
       loading={loading}
       error={error}
     >
       <Container>
-        <Typography variant="h4" className="titulo">
-          SPRINT {datosSprint.numeroSprint}
-        </Typography>
+        <Box >
+          <div>
+            <Typography variant="h4" className="titulo">
+              SPRINT {datosSprint?.numeroSprint} 
+            </Typography>
+          </div>
+          <Box display="flex" flexWrap={'wrap'}>
+              <Box display="flex" alignItems="center" m={2}>
+                <CalendarTodayIcon sx={{ mr: 1 }} />
+                <Typography variant="body1">
+                  <strong>Fecha de Inicio:</strong>{" "}
+                  {datosSprint?.fechaIni} a las 00:00                  
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center" m={2}>
+                <CalendarTodayIcon sx={{ mr: 1 }} />
+                <Typography variant="body1">
+                  <strong>Fecha de Fin:</strong>{" "}
+                  {datosSprint?.fechaFin} a las 23:59
+                </Typography>
+              </Box>
+              <Box display="flex" alignItems="center">
+                <CalendarTodayIcon sx={{ m: 2 }} />
+                <Typography variant="body1">
+                  <strong>Fecha de Entrega precencial:</strong>{" "}
+                  {datosSprint?.fechaEntrega}
+                </Typography>
+            </Box>
+          </Box>
+        </Box>
         <Grid2 container className="datosSprint">
           <Paper className="entregables">
             <Typography variant="h6">Entregables</Typography>
-            {datosSprint.entregables.map((entregable, index) => (
+            {datosSprint?.entregables?.map((entregable, index) => (
               <Box key={index} className="entregableItem">
                 <Checkbox
                   sx={{
@@ -227,7 +317,9 @@ function CalificarSprintU() {
                     transition: "none", // Desactiva la transición de animación
                     cursor: "default",
                   }}
-                  checked={entregable.archivoEntregable !== null}
+                  checked={aceptados[index]}
+                  onChange={()=>handleAceptado(index)}
+                  disabled={tieneNota}
                 />
                 <Typography>{entregable.descripcionEntregable}</Typography>
               </Box>
@@ -237,7 +329,7 @@ function CalificarSprintU() {
             <Typography variant="h6" sx={{ mb: 2.3 }}>
               Archivos
             </Typography>
-            {datosSprint.entregables.map((entregable, index) => (
+            {datosSprint?.entregables?.map((entregable, index) => (
               <FileItem key={index}>
                 {selectIcon(entregable.nombreArchivo)}
                 <FileInfo>
@@ -263,7 +355,7 @@ function CalificarSprintU() {
                     }
                     sx={{ mx: 2 }}
                   >
-                    {entregable.archivoEntregable ? "Entregado" : "Pendiente"}
+                    {entregable.archivoEntregable ? "Entregado" : "No entregado"}
                   </Typography>
                 </FileInfo>
               </FileItem>
@@ -286,32 +378,40 @@ function CalificarSprintU() {
                 inputProps={{ maxLength: 200 }}
                 className="inputComentario"
                 error={errorComentario}
+                disabled={tieneNota}
                 helperText={
                   errorComentario && "Debe tener un minimo de 20 caracteres"
                 }
               />
               <Box className="notaField">
-                <Typography variant="h6" className="notaLabel">
-                  NOTA:
-                </Typography>
-                <TextField
-                  variant="outlined"
-                  size="small"
-                  value={notaSprint}
-                  onChange={handleNotaChange}
-                  inputProps={{
-                    type: "number",
-                  }}
-                  className="notaInput"
-                />
+                <Box display={'flex'}>
+                  <Typography variant="h6" className="notaLabel">
+                    NOTA:
+                  </Typography>
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    value={notaSprint}
+                    onChange={handleNotaChange}
+                    inputProps={{
+                      type: "number",
+                    }}
+                    className="notaInput"
+                    disabled={tieneNota}
+                    error={errorNota}
+                  />
+                </Box>
+                <div>
+                  <span style={{color:'red'}}>{ errorNota && "Es Obligatorio ingresar una nota"}</span>
+                </div>
               </Box>
-              <DecisionButtons
+              {!tieneNota && <DecisionButtons
                 rejectButtonText="Descartar"
                 validateButtonText="Guardar"
                 onReject={handleCancel}
                 onValidate={handleSave}
                 disabledButton={0}
-              />
+              />}
             </FormControl>
           </form>
         </Paper>
@@ -388,8 +488,6 @@ const Container = styled("div")`
   }
 
   .notaField {
-    display: flex;
-    align-items: center;
     margin-top: 1rem;
 
     .notaLabel {

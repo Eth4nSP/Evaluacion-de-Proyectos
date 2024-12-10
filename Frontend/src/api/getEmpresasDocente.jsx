@@ -1,10 +1,11 @@
 export const getEmpresasDocente = async (idDocente) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/api/docente/${idDocente}/empresas`, {
+        const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/docente/${idDocente}/empresas`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         if (!response.ok) {

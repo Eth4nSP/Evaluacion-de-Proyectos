@@ -33,7 +33,7 @@ const InfoSnackbar = ({
   setOpenSnackbar,
   message = "This is a default message",
   severity = "info",
-  autoHide,
+  autoHide = 6000,
 }) => {
   const handleClose = (event, reason) => {
     if (reason === "clickaway") {

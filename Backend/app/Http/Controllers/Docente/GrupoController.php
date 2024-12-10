@@ -7,9 +7,56 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Grupo;
 use App\Http\Controllers\Controller;
 use function Laravel\Prompts\select;
+use App\Http\Controllers\Docente\SesionDocenteController as SesionDocente;
+
 
 class GrupoController extends Controller
-{
+{   
+    public function actualizarGrupo(Request $request)
+    {
+        // Validar los datos recibidos
+        $request->validate([
+            'idGrupo' => 'required|exists:grupo,idGrupo', // Verificar que el grupo exista en la tabla
+            'fechaIniGestion' => 'nullable|date', // Se hace nullable para permitir no cambiar este campo si no se pasa en la solicitud
+            'fechaLimiteEntregaEmpresa' => 'nullable|date|after_or_equal:fechaIniGestion',
+            'fechaLimiteEntregaPlanificacion' => 'nullable|date|after_or_equal:fechaLimiteEntregaEmpresa',
+            'fechaFinPlanificacion' => 'nullable|date|after_or_equal:fechaLimiteEntregaPlanificacion',
+            'fechaFinGestion' => 'nullable|date|after_or_equal:fechaFinPlanificacion',
+        ]);
+
+        // Obtener los datos actuales del grupo
+        $grupo = Grupo::find($request->idGrupo);
+
+        // Filtrar los campos que están siendo enviados por la solicitud
+        $nuevosDatos = $request->only([
+            'fechaIniGestion',
+            'fechaLimiteEntregaEmpresa',
+            'fechaLimiteEntregaPlanificacion',
+            'fechaFinPlanificacion',
+            'fechaFinGestion',
+        ]);
+
+        // Filtrar solo los campos que han cambiado (es decir, los que están presentes en los datos actuales)
+        $actualizar = [];
+        foreach ($nuevosDatos as $campo => $valor) {
+            if ($grupo->$campo != $valor) {
+                $actualizar[$campo] = $valor;
+            }
+        }
+
+        // Si no hay campos para actualizar, devolver una respuesta con error
+        if (empty($actualizar)) {
+            return response()->json(['error' => 'No hay cambios para actualizar.'], 400);
+        }
+
+        // Actualizar solo los campos que han cambiado
+        $grupo->update($actualizar);
+
+        return response()->json(['message' => 'Grupo actualizado correctamente'], 200);
+    }
+
+
+
     public function obtenerTodosLosGrupos()
     {
         // Consulta para obtener los datos de todos los grupos y los docentes asociados
@@ -22,9 +69,7 @@ class GrupoController extends Controller
                 'docente.primerApellido as apellidoPaterno',
                 'docente.segundoApellido as apellidoMaterno',
                 //'grupo.gestionGrupo'
-            )
-            ->where('grupo.gestionGrupo', '=', '2024-2')
-            ->get();
+            )->get();
 
         // Si no se encuentran resultados
         if ($gruposDocentes->isEmpty()) {
@@ -36,30 +81,39 @@ class GrupoController extends Controller
 
     public function obtenerEstudiantesPorGrupo(Request $request)
     {
-        //
+        // $sesiondocente = new SesionDocente();
+        // $idDocente = session('docente.id');
+        // if (!$idDocente) {
+        //     return response()->json(['message' => 'No se ha encontrado al docente en la sesión.'], 400);
+        // }
+    
         $idGrupo = $request->input('idGrupo');
-        $gestionGrupo = $request->input('gestionGrupo');
-        // Consulta para obtener todos los estudiantes y el docente del grupo
-        $datosGrupo = DB::table('estudiantesgrupos')
-            ->join('grupo', 'estudiantesgrupos.idGrupo', '=', 'grupo.idGrupo')
-            ->join('estudiante', 'estudiantesgrupos.idEstudiante', '=', 'estudiante.idEstudiante')
-            ->join('docente', 'grupo.idDocente', '=', 'docente.idDocente')
-            ->leftjoin('estudiantesempresas AS ee', 'estudiantesgrupos.idEstudiante', '=', 'ee.idEstudiante')
+        if (!$idGrupo) {
+            return response()->json(['message' => 'El parámetro idGrupo no fue enviado.'], 400);
+        }
+        
+        $datosGrupo = DB::table('estudiantesgrupos as eg')
+            ->join('grupo as g', 'eg.idGrupo', '=', 'g.idGrupo')
+            ->join('estudiante as e', 'eg.idEstudiante', '=', 'e.idEstudiante')
+            ->join('docente as d', 'g.idDocente', '=', 'd.idDocente')
+            ->leftjoin('estudiantesempresas AS ee', 'eg.idEstudiante', '=', 'ee.idEstudiante')
             ->leftjoin('empresa AS emp', 'ee.idEmpresa', '=', 'emp.idEmpresa')
-            ->where('grupo.idGrupo',"=",   $idGrupo)
-            ->where('grupo.gestionGrupo',$gestionGrupo)
+            ->where('g.idGrupo',"=",   $idGrupo)
+            //->where('grupo.gestionGrupo',$gestionGrupo) REEMPLAZAMOS
+            ->whereRaw('CURDATE() >= g.fechaIniGestion') // Usamos whereRaw para CURDATE()
+            ->whereRaw('CURDATE() <= g.fechaFinGestion') // Usamos whereRaw para CURDATE()
             ->select(
-                'grupo.numGrupo',
-                'estudiante.idEstudiante as id',
-                'estudiante.nombreEstudiante as nombreEstudiante',
-                'estudiante.primerApellido as apellidoPaternoEstudiante',
-                'estudiante.segundoApellido as apellidoMaternoEstudiante',
+                'g.numGrupo',
+                'e.idEstudiante as id',
+                'e.nombreEstudiante as nombreEstudiante',
+                'e.primerApellido as apellidoPaternoEstudiante',
+                'e.segundoApellido as apellidoMaternoEstudiante',
                 'emp.nombreEmpresa'
                 /*'docente.nombreDocente as nombreDocente', 
                 'docente.primerApellido as apellidoPaternoDocente', 
                 'docente.segundoApellido as apellidoMaternoDocente'*/
             )
-            ->orderBy('estudiante.nombreEstudiante')
+            ->orderBy('e.nombreEstudiante')
             ->get();
 
     // Si no se encuentran resultados
@@ -71,26 +125,22 @@ class GrupoController extends Controller
 }
 
 
-    public function obtenerEmpresasPorGrupoYDocente(Request $request)
-    {
-        // Validar los parámetros de entrada
-        $request->validate([
-            'idDocente' => 'required|integer',
-            'gestionGrupo' => 'required|string',
-        ]);
-        // $idDocente = session()->get('docente.id');
 
-        // Ejecutar la consulta
+public function obtenerEmpresasPorGrupoYDocente()
+    {
         $resultados = DB::table('estudiantesgrupos AS eg')
             ->join('grupo AS g', 'eg.idGrupo', '=', 'g.idGrupo')
             ->join('docente AS d', 'g.idDocente', '=', 'd.idDocente')
             ->join('estudiantesempresas AS ee', 'eg.idEstudiante', '=', 'ee.idEstudiante')
             ->join('empresa AS emp', 'ee.idEmpresa', '=', 'emp.idEmpresa')
             ->join('estudiante AS e', 'eg.idEstudiante', '=', 'e.idEstudiante')
-            ->select('emp.nombreEmpresa', 'emp.nombreLargo', 'emp.idEmpresa as id', 'g.gestionGrupo', DB::raw('count(eg.idEstudiante) as totalEstudiantes'), 'g.numGrupo')
-            ->where('d.idDocente', $request->idDocente)
+            ->select('emp.idEmpresa as id','emp.nombreEmpresa', 'emp.nombreLargo', 'g.gestionGrupo', DB::raw('count(eg.idEstudiante) as totalEstudiantes'), 'g.numGrupo')
+            ->where('d.idDocente', session('docente.id'))
             // ->where('g.idGrupo', $request->idGrupo)
-            ->where('g.gestionGrupo', $request->gestionGrupo)
+            //->where('g.gestionGrupo', $request->gestionGrupo)
+            ->whereRaw('CURDATE() >= g.fechaIniGestion') // Usamos whereRaw para CURDATE()
+            ->whereRaw('CURDATE() <= g.fechaFinGestion')
+            ->where('emp.publicada','=','1')
             ->groupBy('emp.nombreEmpresa', 'emp.nombreLargo', 'emp.idEmpresa', 'g.gestionGrupo', 'g.numGrupo')
             ->orderByDesc('g.gestionGrupo')
             ->orderBy('emp.nombreEmpresa')
@@ -105,8 +155,41 @@ class GrupoController extends Controller
         }
 
         // Si hay resultados, retornarlos
-        return response()->json($resultados);
+        return response()->json($resultados,200);
     }
+
+    public function obtenerEmpresasPorGrupoYDocenteEstudiante(Request $request)
+    {
+        $resultados = DB::table('estudiantesgrupos AS eg')
+            ->join('grupo AS g', 'eg.idGrupo', '=', 'g.idGrupo')
+            ->join('docente AS d', 'g.idDocente', '=', 'd.idDocente')
+            ->join('estudiantesempresas AS ee', 'eg.idEstudiante', '=', 'ee.idEstudiante')
+            ->join('empresa AS emp', 'ee.idEmpresa', '=', 'emp.idEmpresa')
+            ->join('estudiante AS e', 'eg.idEstudiante', '=', 'e.idEstudiante')
+            ->select('emp.idEmpresa as id','emp.nombreEmpresa', 'emp.nombreLargo', 'g.gestionGrupo', DB::raw('count(eg.idEstudiante) as totalEstudiantes'), 'g.numGrupo')
+            //->where('g.idGrupo', 'ee.idGrupo')
+            ->where('g.idGrupo', $request ->idGrupo)
+            //->where('g.gestionGrupo', $request->gestionGrupo)
+            ->whereRaw('CURDATE() >= g.fechaIniGestion') // Usamos whereRaw para CURDATE()
+            ->whereRaw('CURDATE() <= g.fechaFinGestion')
+            ->where('emp.publicada','=','1')
+            ->groupBy('emp.nombreEmpresa', 'emp.nombreLargo', 'emp.idEmpresa', 'g.gestionGrupo', 'g.numGrupo')
+            ->orderByDesc('g.gestionGrupo')
+            ->orderBy('emp.nombreEmpresa')
+            ->orderByDesc('e.nombreEstudiante')
+            ->get();
+
+
+        if ($resultados->isEmpty()) {
+            return response()->json([
+                'message' => 'No se encontraron registros para el grupo y/o gestión especificados.'
+            ], 404); // Puedes devolver un código 404 o cualquier otro código de estado
+        }
+
+        // Si hay resultados, retornarlos
+        return response()->json($resultados,200);
+    }
+
     public function getDescripcion($id)
     {
         // Recupera la descripción del curso basado en el ID

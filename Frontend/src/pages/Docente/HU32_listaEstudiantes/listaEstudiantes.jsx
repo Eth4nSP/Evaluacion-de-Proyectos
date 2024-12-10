@@ -1,6 +1,5 @@
 import {useState, useEffect } from 'react';
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN';
-import { useParams } from 'react-router-dom';
 const columns = [
   {
     field: 'nombreCompleto',
@@ -30,17 +29,20 @@ export default function DataTable() {
     errorMessage: "",
     errorDetails: "",
   });
-
-  const {idGrupo, gestionGrupo} = useParams()
-
+  const idGrupo = localStorage.getItem("idGrupo")
   const fetchEstudiantes = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8000/api/docente/listaEstudiantes?` +
+      const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/docente/listaEstudiantes?` +
         new URLSearchParams({
           idGrupo,
-          gestionGrupo,
-        })
+        }),{
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include"
+        }
       );
       if (!response.ok) {
         throw new Error('Error de grupo');
@@ -72,7 +74,7 @@ export default function DataTable() {
       datosTabla={estudiantes}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack="/"
+      dirBack="/homeDocente"
       dirForward=""
       mensajeSearch = "Buscar Estudiante o empresa"
       nombreContador = "Estudiantes"

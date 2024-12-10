@@ -50,21 +50,21 @@ class joaquinController extends Controller{
         }
     
         // Obtener los datos de la empresa
-        $empresa = DB::table('tis.empresa')
+        $empresa = DB::table('empresa')
             ->where('idEmpresa', $relacion->idEmpresa)
             ->select('idEmpresa', 'nombreEmpresa', 'nombreLargo', 'publicada')
             ->first();
     
     
         // Obtener los datos específicos de los estudiantes asociados a esa empresa
-        $integrantes = DB::table('tis.estudiante')
-            ->join('tis.estudiantesempresas', 'tis.estudiante.idEstudiante', '=', 'tis.estudiantesempresas.idEstudiante')
-            ->where('tis.estudiantesempresas.idEmpresa', $relacion->idEmpresa)
+        $integrantes = DB::table('estudiante')
+            ->join('estudiantesempresas', 'estudiante.idEstudiante', '=', 'estudiantesempresas.idEstudiante')
+            ->where('estudiantesempresas.idEmpresa', $relacion->idEmpresa)
             ->select(
-                'tis.estudiante.idEstudiante',
-                'tis.estudiante.nombreEstudiante',
-                'tis.estudiante.primerApellido',
-                'tis.estudiante.segundoApellido'
+                'estudiante.idEstudiante',
+                'estudiante.nombreEstudiante',
+                'estudiante.primerApellido',
+                'estudiante.segundoApellido'
             )
             ->get();
     
@@ -128,6 +128,7 @@ class joaquinController extends Controller{
         $empresa = Empresa::create([
             'nombreLargo'    => $request->nombreLargo,
             'nombreEmpresa'  => $request->nombreCorto,
+            'publicada'      => '0'
         ]);
 
         $empresa->estudiantes()->attach($request->estudiante);
@@ -146,7 +147,7 @@ class joaquinController extends Controller{
             'integrantes.*' => 'exists:estudiante,idEstudiante'
         ]);
 
-        $empresa = DB::table('tis.empresa')->where('idEmpresa', $idEmpresa)->first();
+        $empresa = DB::table('empresa')->where('idEmpresa', $idEmpresa)->first();
         if (!$empresa) {
             return response()->json(['mensaje' => 'Empresa no encontrada'], 404);
         }
@@ -157,7 +158,7 @@ class joaquinController extends Controller{
         // Actualizar los integrantes de la empresa
         DB::transaction(function () use ($idEmpresa, $validatedData) {
             // Eliminar los registros actuales de estudiantes en esa empresa
-            DB::table('tis.estudiantesempresas')->where('idEmpresa', $idEmpresa)->delete();
+            DB::table('estudiantesempresas')->where('idEmpresa', $idEmpresa)->delete();
 
             // Insertar los nuevos integrantes
             $nuevosIntegrantes = [];
@@ -167,7 +168,7 @@ class joaquinController extends Controller{
                     'idEstudiante' => $idEstudiante
                 ];
             }
-            DB::table('tis.estudiantesempresas')->insert($nuevosIntegrantes);
+            DB::table('estudiantesempresas')->insert($nuevosIntegrantes);
         });
 
         return response()->json(['mensaje' => 'Integrantes actualizados correctamente']);
@@ -176,10 +177,10 @@ class joaquinController extends Controller{
     public function publicarEmpresaPorEstudiante($idEstudiante)
     {
         // Buscar la empresa asociada al estudiante
-        $empresa = DB::table('tis.estudiantesempresas')
-            ->join('tis.empresa', 'tis.estudiantesempresas.idEmpresa', '=', 'tis.empresa.idEmpresa')
-            ->where('tis.estudiantesempresas.idEstudiante', $idEstudiante)
-            ->select('tis.empresa.idEmpresa', 'tis.empresa.publicada')
+        $empresa = DB::table('estudiantesempresas')
+            ->join('empresa', 'estudiantesempresas.idEmpresa', '=', 'empresa.idEmpresa')
+            ->where('estudiantesempresas.idEstudiante', $idEstudiante)
+            ->select('empresa.idEmpresa', 'empresa.publicada')
             ->first();
         
         // Verificar si el estudiante está asociado a alguna empresa
@@ -193,7 +194,7 @@ class joaquinController extends Controller{
         }
 
         // Actualizar el campo publicada a 1
-        DB::table('tis.empresa')
+        DB::table('empresa')
             ->where('idEmpresa', $empresa->idEmpresa)
             ->update(['publicada' => 1]);
 
@@ -202,16 +203,33 @@ class joaquinController extends Controller{
     
     public function obtenerEstudiantesSinEmpresa($idEstudiante)
     {
-        // Obtener estudiantes que no están asociados a ninguna empresa, excluyendo al estudiante con el ID proporcionado
-        $resultado = Estudiante::select('estudiante.idEstudiante', 'nombreEstudiante', 'primerApellido', 'segundoApellido')
-            ->leftJoin('estudiantesempresas AS ee', 'ee.idEstudiante', '=', 'estudiante.idEstudiante')
-            ->whereNull('ee.idEmpresa') // Asegura que no haya una relación con ninguna empresa
-            ->where('estudiante.idEstudiante', '<>', $idEstudiante) // Excluye al estudiante con el id proporcionado
+        // Obtener el grupo al que pertenece el estudiante proporcionado
+        $grupo = EstudiantesGrupos::where('idEstudiante', $idEstudiante)
+            ->select('idGrupo')
+            ->first();
+    
+        if (!$grupo) {
+            return response()->json(['error' => 'El estudiante no pertenece a ningún grupo.'], 404);
+        }
+    
+        // Obtener estudiantes que no están asociados a ninguna empresa y pertenecen al mismo grupo
+        $resultado = EstudiantesGrupos::select(
+                'estudiante.idEstudiante',
+                'estudiante.nombreEstudiante',
+                'estudiante.primerApellido',
+                'estudiante.segundoApellido'
+            )
+            ->join('estudiante', 'estudiantesgrupos.idEstudiante', '=', 'estudiante.idEstudiante') // Relación con la tabla de estudiantes
+            ->leftJoin('estudiantesempresas AS ee', 'ee.idEstudiante', '=', 'estudiante.idEstudiante') // Relación con empresas
+            ->where('estudiantesgrupos.idGrupo', $grupo->idGrupo) // Filtrar por el mismo grupo
+            ->whereNull('ee.idEmpresa') // Asegurar que no tienen empresa
+            ->where('estudiante.idEstudiante', '<>', $idEstudiante) // Excluir al estudiante proporcionado
             ->orderBy('estudiante.nombreEstudiante')
             ->get();
-
+    
         return response()->json($resultado, 200);
     }
+    
 
 
 

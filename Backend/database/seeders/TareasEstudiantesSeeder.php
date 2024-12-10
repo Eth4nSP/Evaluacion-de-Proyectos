@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-
 class TareasEstudiantesSeeder extends Seeder
 {
     /**
@@ -14,8 +13,7 @@ class TareasEstudiantesSeeder extends Seeder
     {
         $tareas = DB::table('tarea')
             ->join('semana', 'tarea.idSemana', '=', 'semana.idSemana')
-            ->join('sprint', 'semana.idSprint', '=', 'sprint.idSprint')
-            ->join('planificacion', 'sprint.idPlanificacion', '=', 'planificacion.idPlanificacion')
+            ->join('planificacion', 'semana.idPlanificacion', '=', 'planificacion.idPlanificacion') // Relación directa entre semana y planificacion
             ->select('tarea.idTarea', 'planificacion.idEmpresa')
             ->get();
 

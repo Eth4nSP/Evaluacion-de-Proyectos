@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('semana', function (Blueprint $table) {
             $table->id('idSemana');
-            $table->unsignedBigInteger('idSprint');
-            $table->tinyInteger('numeroSemana');
+            $table->unsignedBigInteger('idPlanificacion');
+            $table->integer('numeroSemana');
             $table->date('fechaIni');
             $table->date('fechaFin');
 
-            // * Llave foranea idSprint
-            $table->foreign('idSprint')
-                ->references('idSprint')
-                ->on('sprint')
+            // Llave foránea idPlanificacion
+            $table->foreign('idPlanificacion')
+                ->references('idPlanificacion')
+                ->on('planificacion')
                 ->onDelete('cascade');
 
             $table->charset = 'utf8mb4';

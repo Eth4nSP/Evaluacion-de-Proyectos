@@ -23,5 +23,15 @@ class EstudiantesGruposSeeder extends Seeder
                 'idEstudiante' => $estudiante,
             ]);
         }
+        $estudiantes = range(33, 41); 
+        $grupo = 3;
+
+        foreach ($estudiantes as $estudiante) {
+            
+            DB::table('estudiantesgrupos')->insert([
+                'idGrupo' => $grupo,
+                'idEstudiante' => $estudiante,
+            ]);
+        }
     }
 }

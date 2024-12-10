@@ -264,14 +264,16 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
         entregables: row.entregables,
       })),
     };
+    console.log(dataSprint);
     const response = await fetch(
-      "http://localhost:8000/api/planificacion/guardar",
+      "http://creativeharbor.tis.cs.umss.edu.bo/api/planificacion/guardarPlanificacion",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(dataPlanificacion),
+        credentials: 'include'
       }
     );
     const responseData = await response.json();
@@ -285,16 +287,18 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
     } else {
       console.log("Planificacion modificada con exito.");
       const responseSprint = await fetch(
-        "http://localhost:8000/api/planificacion/guardarSprints",
+        "http://creativeharbor.tis.cs.umss.edu.bo/api/planificacion/guardarSprints",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(dataSprint),
+          body: JSON.stringify(dataSprint)
         }
       );
       const responseDataSprint = await responseSprint.json();
+      console.log(responseDataSprint);
+      console.log(dataSprint);
       if (
         responseDataSprint.error !== undefined &&
         responseDataSprint.error !== null
@@ -313,7 +317,7 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
           .map((key) => {
             const errors = responseDataSprint.errors[key];
             return errors
-              .map((error) => `${key}: ${translateError(error)}`)
+              .map((error) => `${translateError(error)} `)
               .join("\n");
           })
           .join("\n");
@@ -347,13 +351,14 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
             entregables: entregables[index] || [], // Asignar entregables correspondiente o un array vacío
           }));
           const responseEntregables = await fetch(
-            "http://localhost:8000/api/planificacion/guardarEntregables",
+            "http://creativeharbor.tis.cs.umss.edu.bo/api/planificacion/guardarEntregables",
             {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({ entregables: entregablesData }),
+              credentials: 'include'
             }
           );
 
@@ -544,7 +549,6 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
             Añadir fila
           </Button>
         )}
-+
         <DecisionButtons
           rejectButtonText="Descartar"
           validateButtonText="Guardar cambios"

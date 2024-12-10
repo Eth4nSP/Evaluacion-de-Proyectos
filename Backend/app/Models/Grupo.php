@@ -18,7 +18,10 @@ class Grupo extends Model
         'codigoAcceso',
         'descripcion',
         'fechaIniGestion',
-        'fechaFinGestion'
+        'fechaFinGestion',
+        'fechaLimiteEntregaEmpresa',
+        'fechaLimiteEntregaPlanificacion',
+        'fechaFinPlanificacion'
     ];
 
     public function estudiantesGrupos()
@@ -35,5 +38,9 @@ class Grupo extends Model
     public function docente()
     {
         return $this->belongsTo(Docente::class, 'idDocente');
+    }
+    
+    public function empresas(){
+        return $this->hasMany(Empresa::class, 'idGrupo');
     }
 }

@@ -18,7 +18,7 @@ function EmpresasTable() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/empresas/")
+    fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/empresas/", {credentials: 'include'})
       .then((response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");

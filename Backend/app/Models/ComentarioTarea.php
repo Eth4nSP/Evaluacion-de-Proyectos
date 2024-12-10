@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class ComentarioTarea extends Model
 {
-    protected $table = 'comentarioTarea';
-    protected $primaryKey = ['idEstudiante', 'idSemana'];
-
+    protected $table = 'comentariotarea';
+    
     /**
-     * No es autoincremental por tener llave primaria compuesta
+     * Clave primaria compuesta (no nativo en Laravel)
      */
-    public $incrementing = false;
+    protected $primaryKey = ['idEstudiante', 'idSemana'];
+    public $incrementing = false; // No es autoincremental por ser compuesta
 
     public $timestamps = false;
 
@@ -21,16 +21,24 @@ class ComentarioTarea extends Model
         'idSemana',
         'comentario',
     ];
+
+    /**
+     * Encuentra un registro por clave primaria compuesta
+     */
     public static function findByCompositeKey($idEstudiante, $idSemana)
     {
         return self::where('idEstudiante', $idEstudiante)
-            ->where('idEstudiante', $idSemana)
+            ->where('idSemana', $idSemana)
             ->first();
     }
+
+    /**
+     * Crea o actualiza un registro basado en clave compuesta
+     */
     public static function createOrUpdate($data)
     {
         // Encuentra el registro existente
-        $record = self::findByCompositeKey($data['idEstudiante'], $data['idEstudiante']);
+        $record = self::findByCompositeKey($data['idEstudiante'], $data['idSemana']);
 
         if ($record) {
             // Actualiza el registro si ya existe
@@ -42,7 +50,7 @@ class ComentarioTarea extends Model
     }
 
     /**
-     * obtiene el estudiante que tiene el comentario
+     * Obtiene el estudiante que tiene el comentario
      */
     public function estudiante()
     {
@@ -50,7 +58,7 @@ class ComentarioTarea extends Model
     }
 
     /**
-     * obtiene la semana que tiene el comentario
+     * Obtiene la semana que tiene el comentario
      */
     public function semana()
     {

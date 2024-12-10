@@ -44,7 +44,8 @@ class EntregablesSeeder extends Seeder
             foreach ($entregablesSeleccionados as $entregable) {
                 $data = [
                     'idSprint' => $sprint->idSprint,
-                    'descripcionEntregable' => $entregablesPosibles[$entregable]
+                    'descripcionEntregable' => $entregablesPosibles[$entregable],
+                    'aceptado' => false 
                 ];
                 if ($sprint->idPlanificacion == 1) {
                     $data['nombreArchivo'] = 'archivo_' . uniqid() . '.pdf';

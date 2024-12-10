@@ -20,6 +20,9 @@ class CreateGrupoTable extends Migration
             $table->longText('descripcion')->nullable();
             $table->date('fechaIniGestion')->nullable();
             $table->date('fechaFinGestion')->nullable();
+            $table->date('fechaLimiteEntregaEmpresa')->nullable();
+            $table->date('fechaLimiteEntregaPlanificacion')->nullable();
+            $table->date('fechaFinPlanificacion')->nullable();
 
             // * Llave foranea idDocente
             $table->foreign('idDocente')

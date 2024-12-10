@@ -22,11 +22,11 @@ class DatabaseSeeder extends Seeder
         // * Poblar clase docente
         $this->call(DocenteSeeder::class);
 
-        // * Poblar clase Empresa
-        $this->call(EmpresaSeeder::class);
-
         // * Poblar clase Grupo
         $this->call(GrupoSeeder::class);
+
+        // * Poblar clase Empresa
+        $this->call(EmpresaSeeder::class);
 
         // * Poblar clase Estudiante
         $this->call(EstudianteSeeder::class);
@@ -57,5 +57,7 @@ class DatabaseSeeder extends Seeder
 
         // * Poblar clase ComentarioTareaSeeder
         $this->call(ComentarioTareaSeeder::class);
+
+        $this->call(AdministradorSeeder::class);
     }
 }

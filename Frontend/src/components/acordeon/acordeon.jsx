@@ -1,10 +1,9 @@
 import { Fragment, useState, useEffect } from 'react';
 import SprintSemanas from '../SprintTareas/sprintSemanas';
 import { Box } from '@mui/material';
-import { useParams } from 'react-router-dom'
 // eslint-disable-next-line react/prop-types
 const VisualizarSprintEst = ({navigateLink, verSprints, sprints=[]}) => {
-    const {idSprint} = useParams()
+    const idSprint = localStorage.getItem("idSprint")
     const [sprintOpen, setSprintOpen] = useState([])
     useEffect(()=>{
         if(sprints.length > 0){

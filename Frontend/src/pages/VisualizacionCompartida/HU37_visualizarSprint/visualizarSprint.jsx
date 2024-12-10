@@ -1,28 +1,42 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { styled } from "@mui/material/styles";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  getSprintPorId,
-} from "../../../api/visualizarSprint/visualizarSprint";
+import { getSprintPorId } from "../../../api/visualizarSprint/visualizarSprint";
 import {
   Typography,
   Paper,
-  List,
-  ListItem,
-  ListItemText,
   Box,
   Button,
-  Grid2,
+  Link,
+  Grid,
   Divider,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from "@mui/material";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import AssignmentIcon from "@mui/icons-material/Assignment";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import DescriptionIcon from "@mui/icons-material/Description";
+import FolderZipIcon from "@mui/icons-material/FolderZip";
+import PhotoIcon from "@mui/icons-material/Photo";
 import BaseUI from "../../../components/baseUI/baseUI";
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  [`&.${theme.breakpoints.down("sm")}`]: {
+    fontSize: "0.8rem",
+    padding: "8px 4px",
+  },
+}));
+
 function VisualizarSprint() {
   const [sprint, setSprint] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState({
-    error:false,
+    error: false,
     errorMessage: "",
     errorDetails: "",
   });
@@ -40,10 +54,11 @@ function VisualizarSprint() {
       } catch (error) {
         console.error("Error al obtener datos:", error);
         setError({
-          error:true,
+          error: true,
           errorMessage: "Ha ocurrido un error",
           errorDetails: error.message,
         });
+        setLoading(false);
       }
     }
 
@@ -54,113 +69,151 @@ function VisualizarSprint() {
     navigate(`/1/homeGrupoE/1/empresas/${idEmpresa}`);
   };
 
+  const selectIcon = (nombreArchivo) => {
+    if (!nombreArchivo) return <DescriptionIcon />;
+    const tipo = nombreArchivo.split(".").pop().toLowerCase();
+    switch (tipo) {
+      case "pdf":
+        return <PictureAsPdfIcon />;
+      case "docx":
+        return <DescriptionIcon />;
+      case "zip":
+        return <FolderZipIcon />;
+      case "png":
+      case "jpg":
+        return <PhotoIcon />;
+      default:
+        return <DescriptionIcon />;
+    }
+  };
+
   return (
     <BaseUI
-      titulo={"VISUALIZAR SPRINT"}
+      titulo="VISUALIZAR SPRINT"
       ocultarAtras={false}
       confirmarAtras={false}
       dirBack={`/visualizarSprint/empresa/${idEmpresa}`}
       loading={loading}
       error={error}
     >
-      {!sprint ? 
-      (
-        <Typography align="center">
-          No se encontró información para este sprint.
-        </Typography>
-      ) 
-      : 
-      (
-        <Paper elevation={3} sx={{ padding: 3, my: 3 }}>
-          <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
-            SPRINT {sprint.numeroSprint}
+      <Container>
+        {!sprint ? (
+          <Typography align="center">
+            No se encontró información para este sprint.
           </Typography>
-          <Divider sx={{ my: 2 }} />
-          <Grid2 container spacing={2}>
-            <Grid2 item xs={12} sm={6}>
-              <Box
-                display="flex"
-                alignItems="center"
-                flexDirection={{ xs: "column", sm: "row" }}
-                justifyContent="space-between"
-              >
-                <Grid2 item xs={12} sm={4}>
-                  <Box display="flex" alignItems="center" m={2}>
-                    <CalendarTodayIcon sx={{ mr: 1 }} />
-                    <Typography variant="body1">
-                      <strong>Fecha de Inicio:</strong>{" "}
-                      {new Date(sprint.fechaIni).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                </Grid2>
-                <Grid2 item xs={12} sm={4}>
-                  <Box display="flex" alignItems="center" m={2}>
-                    <CalendarTodayIcon sx={{ mr: 1 }} />
-                    <Typography variant="body1">
-                      <strong>Fecha de Fin:</strong>{" "}
-                      {new Date(sprint.fechaFin).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                </Grid2>
-                <Grid2 item xs={12} sm={4}>
-                  <Box display="flex" alignItems="center">
-                    <CalendarTodayIcon sx={{ m: 2 }} />
-                    <Typography variant="body1">
-                      <strong>Fecha de Entrega:</strong>{" "}
-                      {new Date(sprint.fechaEntrega).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                </Grid2>
-              </Box>
-            </Grid2>
-          </Grid2>
+        ) : (
+          <>
+            <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold" }}>
+              SPRINT {sprint.numeroSprint}
+            </Typography>
+            <Divider sx={{ my: 2 }} />
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={4}>
+                <Box display="flex" alignItems="center">
+                  <CalendarTodayIcon sx={{ mr: 1 }} />
+                  <Typography variant="body1">
+                    <strong>Fecha de Inicio:</strong>{" "}
+                    {new Date(sprint.fechaIni).toLocaleDateString()}
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Box display="flex" alignItems="center">
+                  <CalendarTodayIcon sx={{ mr: 1 }} />
+                  <Typography variant="body1">
+                    <strong>Fecha de Fin:</strong>{" "}
+                    {new Date(sprint.fechaFin).toLocaleDateString()}
+                  </Typography>
+                </Box>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Box display="flex" alignItems="center">
+                  <CalendarTodayIcon sx={{ mr: 1 }} />
+                  <Typography variant="body1">
+                    <strong>Fecha de Entrega:</strong>{" "}
+                    {new Date(sprint.fechaEntrega).toLocaleDateString()}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
 
-          <Grid2 item xs={12} >
-            <Box display="flex" alignItems="center">
-              <MonetizationOnIcon sx={{ m: 2 }} />
+            <Box display="flex" alignItems="center" mt={2}>
+              <MonetizationOnIcon sx={{ mr: 1 }} />
               <Typography variant="body1">
                 <strong>Cobro:</strong> {sprint.cobro}%
               </Typography>
             </Box>
-          </Grid2>
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            <AssignmentIcon sx={{ verticalAlign: "middle", mr: 1 }} />
-            Entregables de la Planificacion:
-          </Typography>
-          <List sx={{ bgcolor: "background.paper", borderRadius: 1 }}>
-            {sprint.entregables.map((entregable) => (
-              <ListItem key={entregable.idEntregables}>
-                <ListItemText
-                  primary={entregable.descripcionEntregable}
-                  primaryTypographyProps={{ fontWeight: "medium" }}
-                />
-              </ListItem>
-            ))}
-          </List>
-          <Box sx={{ mt: 3, display: "flex", justifyContent: "left" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleVerTareas}
-              sx={{
-                fontWeight: "bold",
-                px: 4,
-                py: 1,
-                borderRadius: 2,
-                boxShadow: 2,
-                "&:hover": {
-                  boxShadow: 4,
-                },
-              }}
-            >
-              Ver Tareas
-            </Button>
-          </Box>
-        </Paper>
-      )}
+            <Divider sx={{ my: 2 }} />
+            <TableContainer component={Paper}>
+              <Table
+                sx={{ minWidth: 650 }}
+                aria-label="tabla de entregables y archivos"
+              >
+                <TableHead>
+                  <TableRow>
+                    <StyledTableCell>Entregable</StyledTableCell>
+                    <StyledTableCell>Archivo</StyledTableCell>
+                    <StyledTableCell align="center">Estado</StyledTableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {sprint.entregables.map((entregable, index) => (
+                    <TableRow key={index}>
+                      <StyledTableCell>
+                        {entregable.descripcionEntregable}
+                      </StyledTableCell>
+                      <StyledTableCell>
+                        <Box display="flex" alignItems="center">
+                          {selectIcon(entregable.nombreArchivo)}
+                          <Box ml={1}>
+                            {entregable.nombreArchivo ? (
+                              <Link
+                                href={`http://http://creativeharbor.tis.cs.umss.edu.bo/api:8000/storage/archivos/${entregable.nombreArchivo}`}
+                                target="_blank"
+                                underline="hover"
+                              >
+                                {entregable.nombreArchivo}
+                              </Link>
+                            ) : (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                No hay archivo adjunto
+                              </Typography>
+                            )}
+                          </Box>
+                        </Box>
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
+                        <Typography
+                          variant="body2"
+                          color={
+                            entregable.nombreArchivo
+                              ? "success.main"
+                              : "error.main"
+                          }
+                        >
+                          {entregable.nombreArchivo
+                            ? "Entregado"
+                            : "No entregado"}
+                        </Typography>
+                      </StyledTableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+
+          </>
+        )}
+      </Container>
     </BaseUI>
   );
 }
+
+const Container = styled("div")`
+  padding: 1.5rem;
+`;
 
 export default VisualizarSprint;

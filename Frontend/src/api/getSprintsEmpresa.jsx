@@ -1,10 +1,11 @@
 export const getSprintsEmpresa = async (idEmpresa, idDocente) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/api/empresa/${idEmpresa}/${idDocente}/sprints`, {
+        const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/${idDocente}/sprints`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         if (!response.ok) {
@@ -24,11 +25,12 @@ export const getSprintsEmpresa = async (idEmpresa, idDocente) => {
 
 export const getSprintEstudiantes = async (idEmpresa, idSprint) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprint/${idSprint}/tareas`, {
+        const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprint/${idSprint}/tareas`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         if (!response.ok) {
@@ -45,12 +47,13 @@ export const getSprintEstudiantes = async (idEmpresa, idSprint) => {
 
 export const updateSprintEvaluar = async (idEmpresa, idSprint, estudiantes) => {
     try {
-        const response = await fetch(`http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprint/${idSprint}/evaluacion`, {
+        const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprint/${idSprint}/evaluacion`, {
             
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ estudiantes }),
             
            

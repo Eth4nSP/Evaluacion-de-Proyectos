@@ -11,7 +11,7 @@ class Semana extends Model
     public $incrementing = false;
     public $timestamps = false;
     protected $fillable = [
-        'idSprint',
+        'idPlanificacion',
         'numeroSemana',
         'fechaIni',
         'fechaFin',
@@ -22,13 +22,13 @@ class Semana extends Model
         return $this->hasMany(Tarea::class, 'idSemana');
     }
 
-    public function sprint()
-    {
-        return $this->belongsTo(Sprint::class, 'idSprint');
-    }
-
     public function comentarioTarea()
     {
         return $this->hasMany(ComentarioTarea::class, 'idSemana');
+    }
+
+    public function planificacion()
+    {
+        return $this->belongsTo(Planificacion::class, 'idPlanificacion');
     }
 }

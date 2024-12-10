@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Error from '../../../components/error/error';
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN';
-
+import { getPlanificacionesAceptadas } from "../../../api/getPlanificacionesAceptadas";
 const columns = [
   { field: 'nombreEmpresa', headerName: 'Nombre Empresa', type: 'string', flex: 2 },
   { field: 'nombreLargo', headerName: 'Nombre Empresa largo', type: 'string', flex: 2 }
 ];
 
 function EmpresasParaTareas() {
-  const {idGrupo, idEmpresa} = useParams();
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState({
@@ -18,21 +17,12 @@ function EmpresasParaTareas() {
     errorDetails: "",
   });
 
-  const idDocente = 1;
-  const gestionGrupo = '2024-2'
-
   useEffect(() => {
     setLoading(true);
     const fetchEmpresas = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/api/docente/obtenerEmpresasPorGrupoYDocente?` +
-          new URLSearchParams({ idDocente, gestionGrupo })
-        );
-
-        if (!response.ok) throw new Error('Error fetching data');
-
-        const result = await response.json();
-        console.log(result)
+        const result = await getPlanificacionesAceptadas();
+        if (!result) throw new Error("No se encontraron datos");
         setData(result);
       } catch (err) {
         setError({
@@ -43,7 +33,7 @@ function EmpresasParaTareas() {
       } finally {
         setLoading(false);
       }
-    };
+    };    
     fetchEmpresas();
   }, []);
 
@@ -56,7 +46,7 @@ function EmpresasParaTareas() {
       ocultarAtras={false}
       confirmarAtras={false}
       dirBack="/"
-      dirForward= {`/homeGrupo/${idGrupo}/empresasVerTareas/`}
+      dirForward= {`/homeDocente/listaEmpresasVerTareas/sprints`}
       mensajeSearch="Buscar Empresa"
       nombreContador="Empresas"
       loading={loading}

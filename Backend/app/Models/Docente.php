@@ -16,7 +16,10 @@ class Docente extends Model
         'primerApellido',
         'segundoApellido',
         'contrasena',
+        'email'
     ];
+    
+    public $timestamps = false;
 
     public function grupos()
     {

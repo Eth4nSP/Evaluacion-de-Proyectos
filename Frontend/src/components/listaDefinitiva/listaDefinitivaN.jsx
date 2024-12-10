@@ -29,8 +29,9 @@ function ListaDefinitivaN({
     const navigate = useNavigate();
 
     const handleRowClick = (id) => {
+        localStorage.setItem('idEmpresa',id)
         if (dirForward) {
-            navigate(`${dirForward}${id}`);
+            navigate(`${dirForward}`);
         }
     }
     const [searchValue, setSearchValue] = useState('');

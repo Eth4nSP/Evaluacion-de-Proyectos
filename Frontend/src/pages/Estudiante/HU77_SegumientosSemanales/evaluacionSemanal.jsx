@@ -47,11 +47,12 @@ const EvaluarHito = () => {
 
     const getNombreEmpresa = async () => {
       try {
-          const response = await fetch(`http://127.0.0.1:8000/api/nombreEmpresa/${idEmpresa}`, {
+          const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/nombreEmpresa/${idEmpresa}`, {
               method: 'GET',
               headers: {
                   'Content-Type': 'application/json',
               },
+              credentials: 'include'
           });
 
           if (!response.ok) throw new Error('Error al obtener los datos de la empresa');
@@ -68,11 +69,12 @@ const EvaluarHito = () => {
     };
     const getComentarios = async () => {
       try {
-          const response = await fetch(`http://localhost:8000/api/seguimientoSemanalComentarios/semanaElegida/${idSemana}`, {
+          const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/seguimientoSemanalComentarios/semanaElegida/${idSemana}`, {
               method: 'GET',
               headers: {
                   'Content-Type': 'application/json',
               },
+              credentials: 'include'
           });
           const responseData = await response.json();
           setComentarios(responseData)

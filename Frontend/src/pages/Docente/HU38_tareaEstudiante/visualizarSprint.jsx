@@ -1,44 +1,62 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import BaseUI from '../../../components/baseUI/baseUI.jsx';
-import { getSprintSemanas } from '../../../api/sprintApi.jsx'; 
-import Acordeon from '../../../components/acordeon/acordeon.jsx'
+import SprintSemanas from "../../../components/SprintTareas/sprintSemanas";
+import { getSemanasTareas } from "../../../api/getEmpresa";
 const VisualizarSprintEst = () => {
-    const { idSprint, idEmpresa, idGrupo } = useParams(); 
-    const [sprints, setSprints] = useState([]);
-    const [error, setError] = useState(false);
+    const idEmpresa = localStorage.getItem("idEmpresa")
+    const idEstudiante = localStorage.getItem("idEstudiante")
+    const [error, setError] = useState({error:false});
     const [loading, setLoading] = useState(true); 
+    const [semana, setSemana] = useState([]);
     useEffect(() => {
-        const fetchSprintData = async () => {
-            try {
-                const data = await getSprintSemanas(idEmpresa===undefined? idSprint : idEmpresa); 
-                console.log([data])
-                setSprints([data]);
-            } catch (err) {
-                console.error('Error en la solicitud:', err);
-                setError(true); 
-            } finally {
-                setLoading(false); 
-            }
-        };
-        
-        fetchSprintData();
+      const fetchSprints = async () => {
+        try {
+          const data = await getSemanasTareas(idEmpresa);
+          const dateNow = new Date()
+          const newData = data[0]
+          console.log(newData)
+          const semanaActual = newData?.semanas.filter((semana) => {
+            console.log()
+            const a = semana.fechaIni <= normalizeDate(dateNow) && 
+                      normalizeDate(dateNow) <= semana.fechaFin;
+            return a}
+          ) || [];
+          console.log(semanaActual);
+          const semanaActualV = semanaActual[0]
+          setSemana(semanaActualV)
+        } catch (error) {
+          setError({error:true})
+          console.error("Error al obtener los datos:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSprints();
     }, []); 
+    function normalizeDate(date) {
+      const array = (date.toISOString()).split('T')
+      const formatoDate =  array[0]
+      return formatoDate;
+    }
     return (
         <BaseUI
             titulo={'SELECCIONE UNA TAREA PARA VISUALIZAR'}
             ocultarAtras={false}
             confirmarAtras={false}
-            dirBack={'/'}
+            dirBack={idEstudiante===null?`/homeDocente/listaEmpresasVerTareas`:'/homeEstu'}
             loading={loading}
             error={error}
-        >        
-            <Acordeon
-                navigateLink={`/homeGrupo/${idGrupo}/empresaVerTareas/${idEmpresa}/SprintSemanatarea/`}
-                bloquearFechas={false}
-                verSprints={true}
-                sprints={sprints}        
-            ></Acordeon>
+        >
+             <SprintSemanas 
+                key={1} 
+                title={`Semana ${semana?.numeroSemana}`} 
+                semana={semana} 
+                idSprint={1} 
+                navigateLink={idEstudiante===null?`/homeDocente/listaEmpresasVerTareas/sprints/tarea`:'/homeEstu/listaSprintsSemanasTareas/verTarea'}
+                semanaTexto = {true}
+                isOpenSprint = {false}
+            >
+            </SprintSemanas>
         </BaseUI>
     );
 }

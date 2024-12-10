@@ -1,12 +1,13 @@
 export const getEmpresaData = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 
@@ -25,12 +26,13 @@ export const getEmpresaData = async (idEmpresa) => {
 export const getEmpresaCalificaciones = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresas/notasSprint/${idEmpresa}`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresas/notasSprint/${idEmpresa}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 
@@ -49,12 +51,13 @@ export const getEmpresaCalificaciones = async (idEmpresa) => {
 export const getSprintsEntregables = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprintsEntregables`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprintsEntregables`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 
@@ -70,15 +73,41 @@ export const getSprintsEntregables = async (idEmpresa) => {
   }
 };
 
-export const getSprintSemanasTareas = async (idEmpresa) => {
+export const getSprintConEntregables = async (idSprint) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprintsSemanasTareas`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/sprintConEntregables/${idSprint}`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Error al obtener los sprints y entregables");
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error en la solicitud:", error);
+    throw error;
+  }
+};
+
+export const getSemanasTareas = async (idEmpresa) => {
+  try {
+    const response = await fetch(
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/semanasTareas`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include'
       }
     );
 
@@ -99,12 +128,13 @@ export const getSprintSemanasTareas = async (idEmpresa) => {
 export const getSemanaActualTareas= async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprintSemanaActualTareas`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprintSemanaActualTareas`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 
@@ -125,12 +155,13 @@ export const getSemanaActualTareas= async (idEmpresa) => {
 export const getEmpresasPorGrupo = async (idGrupo) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/grupo/${idGrupo}/empresas`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/grupo/${idGrupo}/empresas`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 
@@ -149,12 +180,13 @@ export const getEmpresasPorGrupo = async (idGrupo) => {
 export const getSprintsYEstudiantesPorEmpresa = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/api/empresa/${idEmpresa}/sprints-estudiantes`,
+      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprints-estudiantes`,
       {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: 'include'
       }
     );
 

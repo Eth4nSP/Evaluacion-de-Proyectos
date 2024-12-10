@@ -1,10 +1,15 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Auth\Authenticatable as AuthenticatableTrait;
 
-class Estudiante extends Model
+class Estudiante extends Model implements Authenticatable
 {
+    use AuthenticatableTrait;  // Asegura que el modelo cumpla con los requisitos de autenticación.
+
     protected $table = 'estudiante';
     protected $primaryKey = 'idEstudiante';
     public $timestamps = false;
@@ -15,7 +20,8 @@ class Estudiante extends Model
         'primerApellido',
         'segundoApellido',
         'contrasena',
-        'numerodefaltasest'
+        'numerodefaltasest',
+        'email'
     ];
 
     public function grupos()

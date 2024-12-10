@@ -83,7 +83,7 @@ function SeleccionarSprintVisualizar() {
       titulo="SELECCIONE UN SPRINT PARA VISUALIZAR"
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack={`/`}
+      dirBack={`/visualizarSprint/`}
       loading={false}
       error={{error:false}}
     >

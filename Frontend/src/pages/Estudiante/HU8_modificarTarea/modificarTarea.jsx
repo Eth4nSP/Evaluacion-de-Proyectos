@@ -1,10 +1,6 @@
 
 import { Fragment, useEffect, useState } from 'react';
-import { useParams } from "react-router-dom";
 import { styled } from '@mui/material';
-
-import Loading from '../../../components/loading/loading.jsx'
-import Error from "../../../components/error/error.jsx";
 import BaseUI from '../../../components/baseUI/baseUI.jsx';
 import { getTareaData, updateTarea } from '../../../api/validarTareas/tareas.jsx';
 import DecisionButtons from '../../../components/Buttons/decisionButtons.jsx'
@@ -16,7 +12,7 @@ import CancelRoundedIcon from '@mui/icons-material/CancelSharp';;
 
 
 function ModificarTarea() {
-  const { idTarea, idGrupo, idEstudiante, idEmpresa } = useParams();
+  const idTarea = localStorage.getItem("idTarea")
   const [responsables, setResponsables] = useState([]);
   const [responsablesError, setResponsablesError] = useState(false);
   const [descripcion, setDescripcion] = useState('Descripcion...');
@@ -45,15 +41,13 @@ function ModificarTarea() {
     title: "",
     description: "",
   });
-
+  const idEmpresa = localStorage.getItem('idEmpresa')
   useEffect(() => {
     const fetchTareaData = async () => {
       try {
-        const [data] = await Promise.all ([
-          getTareaData(idTarea)
-        ])
+        const data = await getTareaData(idTarea, idEmpresa)
         setTitulo(data.nombreTarea)
-        setDescripcion(data.textotarea);
+        setDescripcion(data.textoTarea);
         setResponsables(data.estudiantes);
         console.log(data)
         console.log(data)
@@ -174,7 +168,7 @@ function ModificarTarea() {
         titulo={'MODIFICAR TAREA'}
         ocultarAtras={false}
         confirmarAtras={true}
-        dirBack={`/${idEstudiante}/homeGrupoE/${idGrupo}/Empresas/${idEmpresa}`}
+        dirBack={`/homeEstu/listaTareas`}
         loading={loading}
         error={error}
       >

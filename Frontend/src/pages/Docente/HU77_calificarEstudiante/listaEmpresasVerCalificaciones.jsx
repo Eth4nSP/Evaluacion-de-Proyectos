@@ -1,4 +1,3 @@
-import { useParams } from 'react-router-dom';
 import { useEffect, useState } from "react";
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN'
 import { getPlanificacionesAceptadas } from "../../../api/getPlanificacionesAceptadas";
@@ -19,7 +18,6 @@ const columns = [
 ];
 
 function ListaEmpresasEvaluacionSemanal() {
-  const {idGrupo} = useParams()    
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState({
     errorMessage: "",
@@ -30,7 +28,7 @@ function ListaEmpresasEvaluacionSemanal() {
     setLoading(true);
     const fetchEmpresas = async () => {
       try {
-        const responseData = await Promise.all([getPlanificacionesAceptadas()]);
+        const responseData = await getPlanificacionesAceptadas()
         
       if (responseData.error !== undefined && responseData.error !== null) {
             setError({
@@ -38,9 +36,7 @@ function ListaEmpresasEvaluacionSemanal() {
             errorDetails: error.message,
             });
         } else{
-            const [lista] = await responseData
-            setListaEmpresas(lista);
-            console.log(lista);
+            setListaEmpresas(responseData);
         }
         
         setLoading(false);
@@ -65,8 +61,8 @@ function ListaEmpresasEvaluacionSemanal() {
         datosTabla={listaEmpresas}
         ocultarAtras={false}
         confirmarAtras={false} 
-        dirBack={`/`}
-        dirForward= {`/homeEstudiante/visCalificar/`}
+        dirBack={`/homeDocente`}
+        dirForward= {`/homeDocente/listaEmpresaVerCalificacionesSemanal/empresaSprints`}
         mensajeSearch="Buscar Grupo Empresa"
         nombreContador="GRUPOS"
         loading={loading}

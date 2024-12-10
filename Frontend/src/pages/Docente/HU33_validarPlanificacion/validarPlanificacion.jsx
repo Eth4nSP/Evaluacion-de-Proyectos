@@ -6,6 +6,7 @@ import TablaPlanificacion from "../../../components/tablaPlanificacionDeDesaroll
 import { getEmpresaData } from "../../../api/getEmpresa.jsx";
 import { getPlanificacion } from "../../../api/getPlanificacion.jsx";
 import { validar } from "../../../api/validarPlanificacion/validar.jsx";
+import { rechazar } from "../../../api/validarPlanificacion/rechazar.jsx";
 import { addRevision } from "../../../api/validarPlanificacion/addRevision.jsx";
 import InfoSnackbar from "../../../components/infoSnackbar/infoSnackbar.jsx";
 import CuadroComentario from "../../../components/cuadroComentario/cuadroComentario.jsx";
@@ -144,11 +145,26 @@ function ValidarPlanificacion() {
         severity: "error",
       });
     } else {
-      setSnackbar({
-        open: true,
-        message: revisionResult.message,
-        severity: "success",
-      });
+      const rechazarResult=await rechazar(idEmpresa);
+      console.log(rechazarResult);
+      if (rechazarResult.error == null) {
+        setSnackbar({
+          open: true,
+          message: `${revisionResult.message} Redireccionando a la lista de empresas`,
+          severity: "success",
+        });
+        setTimeout(() => {
+          navigate(`/validarPlanificacion/`);
+        }, 5000);
+      }else{
+        setSnackbar({
+          open: true,
+          message: rechazarResult.error,
+          severity: "error",
+        });
+      }
+
+
     }
   };
 
@@ -170,6 +186,7 @@ function ValidarPlanificacion() {
           <EstadoPlanificacion
             estado={planificacionData.aceptada}
             comentariopublico={planificacionData.comentariopublico}
+            publicada={planificacionData.publicada}
           />
           {planificacionData.aceptada ? (
             <Redirecting />

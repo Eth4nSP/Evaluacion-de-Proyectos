@@ -46,6 +46,21 @@ class EstudianteSeeder extends Seeder
             ['eperez', 'Elena', 'Perez', 'Quispe', 'passElena30', NULL],
             ['framos', 'Fernando', 'Ramos', 'Medina', 'passFernando31', NULL],
             ['mlopez', 'Maria', 'Lopez', 'Hernandez', 'passMaria32', NULL],
+            //para grupo 3
+            ['ajimenez', 'Ana', 'Jiménez', 'Torres', 'passAna33', NULL],
+            ['dperez', 'David', 'Pérez', 'Mendoza', 'passDavid34', NULL],
+            ['cgarcia', 'Carlos', 'García', 'Morales', 'passCarlos35', NULL],
+            ['fmartinez', 'Francisco', 'Martínez', 'Rojas', 'passFrancisco36', NULL],
+            ['nrodriguez', 'Nina', 'Rodríguez', 'Guzmán', 'passNina37', NULL],
+            ['bvasquez', 'Berta', 'Vásquez', 'López', 'passBerta38', NULL],
+            ['jmartinez', 'Jorge', 'Martínez', 'Salazar', 'passJorge39', NULL],
+            ['mmorales', 'Marta', 'Morales', 'Fernández', 'passMarta40', NULL],
+            ['rgarcia', 'Ricardo', 'García', 'Ramírez', 'passRicardo41', NULL],
+            //sin grupo matriculado
+            ['pcastro', 'Patricia', 'Castro', 'Paredes', 'passPatricia42', NULL],
+            ['asanchez', 'Antonio', 'Sánchez', 'Vega', 'passAntonio43', NULL],
+            ['lrojas', 'Lucía', 'Rojas', 'Alvarado', 'passLucia44', NULL],
+
         ];
 
         foreach ($estudiantes as $index => $estudiante) {
@@ -57,6 +72,7 @@ class EstudianteSeeder extends Seeder
                 'segundoApellido' => $estudiante[3],
                 'contrasena' => Hash::make($estudiante[4]),
                 'numerodefaltasest' => $estudiante[5],
+                'email' => strtolower($estudiante[1] . '.' . $estudiante[2] . $index . '@gmail.com')
             ]);
         }
     }
