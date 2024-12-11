@@ -281,4 +281,6 @@ Route::get('/docente/visualizarSemestres', [GestionController::class, 'visualiza
 Route::get('/estudiante/visualizarSemestres', [GestionController::class, 'visualizarSemestresEstudiante']);//utilizado
 
 
+Route::post('/docente/guardarGestionSeleccionada', [GestionController::class, 'guardarGestionSeleccionadaDocente']);
+
 

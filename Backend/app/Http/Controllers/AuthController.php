@@ -41,7 +41,8 @@ class AuthController extends Controller
                     'nombre' => $userD->nombreDocente,
                     'primerApellido' => $userD->primerApellido,
                     'segundoApellido' => $userD->segundoApellido,
-                    'role' => 'docente'
+                    'role' => 'docente',
+                    'gestionGrupo' => ''
                 ]);
 
                 return response()->json([

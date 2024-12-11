@@ -26,8 +26,6 @@ class GestionController extends Controller{
         ->select('g.idGrupo as id','g.gestionGrupo')
         ->where('d.idDocente',$idDocente)
         ->get();
-        
-
         return response()->json($result, 200);
     }
 
@@ -75,5 +73,22 @@ class GestionController extends Controller{
         return response()->json([
             'message' => 'Gestión creada con éxito.',
             'nuevaGestion' => $nuevaGestion,], 201);
-    }      
+    } 
+    
+    public function guardarGestionSeleccionadaDocente(Request $request){
+        // Validar los datos de entrada
+        $validatedData = $request->validate([
+            'gestionGrupo' => 'required|string' // Validación básica
+        ]);
+        // Obtener los datos existentes de la sesión 'docente'
+        $docente = session()->get('docente', []);
+    
+        // Agregar o actualizar el campo 'gestionGrupo' con los datos validados
+        $docente['gestionGrupo'] = $validatedData['gestionGrupo'];
+    
+        // Actualizar la sesión con los datos modificados
+        session()->put('docente', $docente);
+    
+        return response()->json(['message' => 'Gestión actualizada correctamente', 'docente' => $docente]);
+    }    
 }   
