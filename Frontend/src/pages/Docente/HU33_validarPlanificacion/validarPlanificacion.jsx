@@ -245,7 +245,7 @@ function ValidarPlanificacion() {
                 open={openValidateDialog}
                 onClose={() => setOpenValidateDialog(false)}
                 title="Confirmar Validar planificación"
-                description="¿Está seguro de que desea validar esta planificación?"
+                description="¿Está seguro de que desea validar esta planificación?, si es la primera planificacion aceptada, se deshabilitarán todos los campos de edición de fechas."
                 onConfirm={confirmValidate}
               />
               <CuadroDialogo
