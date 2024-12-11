@@ -23,7 +23,7 @@ class GestionController extends Controller{
         $idDocente = session('docente.id');
         $result = DB::table('grupo as g')
         ->join('docente as d', 'g.idDocente','=','d.idDocente')
-        ->select('g.idGrupo as id','g.gestionGrupo')
+        ->select('g.idGrupo as id','g.gestionGrupo', 'g.fechaIniGestion', 'g.fechaFinGestion', 'g.numGrupo')
         ->where('d.idDocente',$idDocente)
         ->get();
         

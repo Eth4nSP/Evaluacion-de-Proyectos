@@ -14,10 +14,9 @@ import { logout } from '../../../api/sesionesApi';
 const HamburgesaDocente = lazy(() => import('../Hamburgesa/hamburgesaDocente'));
 const HamburgesaEstudiante = lazy(() => import('../Hamburgesa/hamburgesaEstudiante'));
 const UserModal= lazy(() => import('../userModal/userModal'));
-
+const apiHost = import.meta.env.VITE_HOST;
 function Header() {
   const [anchorEl, setAnchorEl] = useState(null);
-  const grupo = Number(localStorage.getItem('idGrupo')) !== -1
   const [open, setOpen] = useState(false);
   const [openPerfil, setOpenPerfil] = useState(false);
   const cerrarPerfil = (openPerfil) => {
@@ -49,7 +48,7 @@ function Header() {
     <Box >
       <AppBar position="fixed">
         <Toolbar>
-          {grupo ? (
+          { '/'!== window.location.pathname ? (
             <IconButton
               size="large"
               edge="start"
