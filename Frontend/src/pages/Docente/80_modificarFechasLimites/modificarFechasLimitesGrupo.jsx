@@ -20,67 +20,8 @@ import Error from '../../../components/error/error';
 import { getOriginDocente } from '../../../api/getDatosLogin';
 import InfoSnackbar from '../../../components/infoSnackbar/infoSnackbar';
 import { fechasSubmit } from '../../../api/subirFechas';
+import { getPlanificacionesAceptadas } from '../../../api/getPlanificacionesAceptadas';
 
-const StyledDialog = styled(Dialog)(({ theme }) => ({
-    '& .MuiDialogContent-root': {
-        padding: theme.spacing(3),
-    },
-    '& .MuiDialogActions-root': {
-        padding: theme.spacing(2),
-    },
-}));
-
-const StyledDialogTitle = styled(Box)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.primary.contrastText,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: theme.spacing(2),
-}));
-// eslint-disable-next-line react/prop-types
-const CuadroDialogo = ({ open, onClose, title, description, onSubmit }) => {
-    return (
-        <StyledDialog
-            open={open}
-            onClose={onClose}
-            aria-labelledby="customized-dialog-title"
-            maxWidth="sm"
-            fullWidth
-        >
-            <StyledDialogTitle>
-                <Typography variant="h6" component="h2" id="customized-dialog-title">
-                    {title}
-                </Typography>
-                <IconButton
-                    aria-label="close"
-                    onClick={onClose}
-                    sx={{
-                        color: (theme) => theme.palette.grey[300],
-                        '&:hover': {
-                            color: (theme) => theme.palette.grey[100],
-                        },
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </StyledDialogTitle>
-            <DialogContent dividers>
-                <Box sx={{ mt: 2, mb: 2 }}>
-                    <Typography variant="body1">{description}</Typography>
-                </Box>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} variant="outlined">
-                    Cancelar
-                </Button>
-                <Button type="submit" color="primary" variant="contained" autoFocus onClick={onSubmit}>
-                    Confirmar
-                </Button>
-            </DialogActions>
-        </StyledDialog>
-    );
-};
 
 const FormularioFechas = () => {
     const [snackbar, setSnackbar] = useState({
@@ -89,6 +30,7 @@ const FormularioFechas = () => {
         severity: "info",
         autoHide: 6000,
     });
+    const [deshabilitarCampos, setDeshabilitarCampos] = useState(false);
     const [cuadroDialogo, setCuadroDialogo] = useState(false);
     const [fechasIniciales, setFechasIniciales] = useState({
         fechaIniGestion: '',
@@ -120,39 +62,68 @@ const FormularioFechas = () => {
         }
     };
 
+    const verificarPlanificacionesAceptadas = async () => {
+        try {
+            const planificaciones = await getPlanificacionesAceptadas();
+            if (planificaciones.length > 0) {
+                setDeshabilitarCampos(true);
+                setSnackbar({
+                    open: true,
+                    message: (
+                        <div>
+                            Existen planificaciones aceptadas. Los campos de fecha:
+                            <ul>
+                                <li>--Fecha límite de entrega de planificación</li>
+                                <li>--Fecha final de planificación</li>
+                                <li>--Fecha fin de gestión</li>
+                            </ul>
+                            están deshabilitados.
+                        </div>
+                    ),
+                    severity: 'info',
+                    autoHide: 60000,
+                });
+                
+            }else{
+                setSnackbar({
+                    open: true,
+                    message: (
+                        <div>
+                            No existen planificaciones aceptadas. Los campos de fecha:
+                            <ul>
+                                <li>--Fecha límite de entrega de planificación</li>
+                                <li>--Fecha final de planificación</li>
+                                <li>--Fecha fin de gestión</li>
+                            </ul>
+                            están habilitados, recuerde que al aceptar una planificación, se deshabilitarán.
+                        </div>
+                    ),
+                    severity: 'info',
+                    autoHide: 60000,
+                });
+            }
+        } catch (error) {
+            console.error('Error al verificar planificaciones aceptadas:', error);
+        }
+    };
+
     useEffect(() => {
+        verificarPlanificacionesAceptadas();
         obtenerFechas();
     }, []);
 
     const esquemaValidacion = Yup.object().shape({
-        fechaIniGestion: Yup.date()
-            .required('Requerido'),
-        fechaLimiteEntregaEmpresa: Yup.date()
-            .required('Requerido')
-            .min(
-                Yup.ref('fechaIniGestion'),
-                'Debe ser mayor o igual a la fecha de inicio de gestión.'
-            )
-            .test(
-                'intervalo-7-dias',
-                'Debe haber al menos 7 días entre la fecha de inicio de gestión y esta fecha.',
-                function (value) {
-                    const fechaIniGestion = this.resolve(Yup.ref('fechaIniGestion'));
-                    return (
-                        value && fechaIniGestion && 
-                        new Date(value).getTime() >= new Date(fechaIniGestion).getTime() + 7 * 24 * 60 * 60 * 1000
-                    );
-                }
-            ),
+        fechaIniGestion: Yup.date(),
+        fechaLimiteEntregaEmpresa: Yup.date(),
         fechaLimiteEntregaPlanificacion: Yup.date()
             .required('Requerido')
             .min(
                 Yup.ref('fechaLimiteEntregaEmpresa'),
-                'Debe ser mayor o igual a la fecha límite de entrega de empresas.'
+                'Debe ser mayor o igual a la fecha inicial de entrega de planificación.'
             )
             .test(
                 'intervalo-7-dias',
-                'Debe haber al menos 7 días entre la fecha límite de entrega de empresas y esta fecha.',
+                'Debe haber al menos 7 días entre la fecha inicial de entrega de planificación y esta fecha.',
                 function (value) {
                     const fechaLimiteEntregaEmpresa = this.resolve(Yup.ref('fechaLimiteEntregaEmpresa'));
                     return (
@@ -165,20 +136,20 @@ const FormularioFechas = () => {
             .required('Requerido')
             .min(
                 Yup.ref('fechaLimiteEntregaPlanificacion'),
-                'Debe ser mayor o igual a la fecha límite de entrega de planificación.'
+                'Debe ser mayor o igual a la fecha inicial planificación.'
             )
             .max(
                 Yup.ref('fechaFinGestion'),
                 'Debe ser menor o igual a la fecha final de gestión.'
             )
             .test(
-                'intervalo-7-dias',
-                'Debe haber al menos 7 días entre la fecha límite de entrega de planificación y esta fecha.',
+                'intervalo-30-dias',
+                'Debe haber al menos 30 días entre la fecha inicial de la planificación y esta fecha.',
                 function (value) {
                     const fechaLimiteEntregaPlanificacion = this.resolve(Yup.ref('fechaLimiteEntregaPlanificacion'));
                     return (
                         value && fechaLimiteEntregaPlanificacion && 
-                        new Date(value).getTime() >= new Date(fechaLimiteEntregaPlanificacion).getTime() + 7 * 24 * 60 * 60 * 1000
+                        new Date(value).getTime() >= new Date(fechaLimiteEntregaPlanificacion).getTime() + 30 * 24 * 60 * 60 * 1000
                     );
                 }
             ),
@@ -303,11 +274,9 @@ const FormularioFechas = () => {
                                         type="date"
                                         name="fechaIniGestion"
                                         value={values.fechaIniGestion}
-                                        onChange={handleChange}
+                                        disabled
                                         onBlur={handleBlur}
                                         InputLabelProps={{ shrink: true }}
-                                        error={touched.fechaIniGestion && Boolean(errors.fechaIniGestion)}
-                                        helperText={touched.fechaIniGestion && errors.fechaIniGestion}
                                     />
                                 </Grid>
                                 <Box marginLeft={'1rem'} marginTop={'1rem'} width={'100%'}>
@@ -327,11 +296,9 @@ const FormularioFechas = () => {
                                             type="date"
                                             name="fechaLimiteEntregaEmpresa"
                                             value={values.fechaLimiteEntregaEmpresa}
-                                            onChange={handleChange}
                                             onBlur={handleBlur}
                                             InputLabelProps={{ shrink: true }}
-                                            error={touched.fechaLimiteEntregaEmpresa && Boolean(errors.fechaLimiteEntregaEmpresa)}
-                                            helperText={touched.fechaLimiteEntregaEmpresa && errors.fechaLimiteEntregaEmpresa}
+                                            disabled
                                             sx={{flexGrow:'1'}}
                                         />
                                     </Box>
@@ -357,6 +324,7 @@ const FormularioFechas = () => {
                                             error={touched.fechaLimiteEntregaPlanificacion && Boolean(errors.fechaLimiteEntregaPlanificacion)}
                                             helperText={touched.fechaLimiteEntregaPlanificacion && errors.fechaLimiteEntregaPlanificacion}
                                             sx={{flexGrow:'1'}}
+                                            disabled={deshabilitarCampos}
                                         />        
                                     </Box>
                                     <Box display={'flex'} marginTop={'1rem'}>  
@@ -381,6 +349,7 @@ const FormularioFechas = () => {
                                             error={touched.fechaFinPlanificacion && Boolean(errors.fechaFinPlanificacion)}
                                             helperText={touched.fechaFinPlanificacion && errors.fechaFinPlanificacion}
                                             sx={{flexGrow:'1'}}
+                                            disabled={deshabilitarCampos}
                                         />
                                     </Box>
                                 </Box>
@@ -396,10 +365,11 @@ const FormularioFechas = () => {
                                         InputLabelProps={{ shrink: true }}
                                         error={touched.fechaFinGestion && Boolean(errors.fechaFinGestion)}
                                         helperText={touched.fechaFinGestion && errors.fechaFinGestion}
+                                        disabled={deshabilitarCampos}
                                     />
                                 </Grid>
                             </Grid>
-                            <Box sx={{ mt: 3, display:'flex', justifyContent:'flex-end'}}>
+                            { !deshabilitarCampos && <Box sx={{ mt: 3, display:'flex', justifyContent:'flex-end'}}>
                                 <Button
                                     variant="outlined"
                                     color="primary"
@@ -415,13 +385,13 @@ const FormularioFechas = () => {
                                 >
                                     Guardar
                                 </Button>
-                            </Box>
+                            </Box>}
                         </Box>
                         <CuadroDialogo
                             open={cuadroDialogo}
                             onClose={() => setCuadroDialogo(false)}
                             title="Confirmar Guardado"
-                            description="¿Está seguro de que desea guardar los cambios realizados?"
+                            description="¿Está seguro de que desea guardar los cambios realizados?, recuerde que al aceptar una planificación, se deshabilitarán los campos de fecha."
                             onSubmit={handleSubmit}
                         />
                         <InfoSnackbar
@@ -439,3 +409,63 @@ const FormularioFechas = () => {
 };
 
 export default FormularioFechas;
+const StyledDialog = styled(Dialog)(({ theme }) => ({
+    '& .MuiDialogContent-root': {
+        padding: theme.spacing(3),
+    },
+    '& .MuiDialogActions-root': {
+        padding: theme.spacing(2),
+    },
+}));
+
+const StyledDialogTitle = styled(Box)(({ theme }) => ({
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: theme.spacing(2),
+}));
+// eslint-disable-next-line react/prop-types
+const CuadroDialogo = ({ open, onClose, title, description, onSubmit }) => {
+    return (
+        <StyledDialog
+            open={open}
+            onClose={onClose}
+            aria-labelledby="customized-dialog-title"
+            maxWidth="sm"
+            fullWidth
+        >
+            <StyledDialogTitle>
+                <Typography variant="h6" component="h2" id="customized-dialog-title">
+                    {title}
+                </Typography>
+                <IconButton
+                    aria-label="close"
+                    onClick={onClose}
+                    sx={{
+                        color: (theme) => theme.palette.grey[300],
+                        '&:hover': {
+                            color: (theme) => theme.palette.grey[100],
+                        },
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+            </StyledDialogTitle>
+            <DialogContent dividers>
+                <Box sx={{ mt: 2, mb: 2 }}>
+                    <Typography variant="body1">{description}</Typography>
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={onClose} variant="outlined">
+                    Cancelar
+                </Button>
+                <Button type="submit" color="primary" variant="contained" autoFocus onClick={onSubmit}>
+                    Confirmar
+                </Button>
+            </DialogActions>
+        </StyledDialog>
+    );
+};
