@@ -200,7 +200,7 @@ Route::post('/sprint/{idSprint}/actualizar', [SprintController::class, 'actualiz
 // ============================      SESIONES DOCENTE     ======================================
 
 Route::get('/session/active/docente', [AuthController::class, 'isSessionActiveDocente']);
-Route::get('/docente/getGrupo', [SesionDocenteController::class, 'getGrupoSesion']);
+Route::get('/docente/getGrupo/{idGrupo}', [SesionDocenteController::class, 'getGrupoSesion']);
 
 // ============================      SESIONES ESTUDIANTE  ====================================
 
