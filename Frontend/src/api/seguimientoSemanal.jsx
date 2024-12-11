@@ -1,7 +1,7 @@
 const apiHost = import.meta.env.VITE_HOST;
 export const getSeguimiento = async (idPlanificacion) => {
     try {
-        const response = await fetch(`${apiHost}/api/seguimientoSemanal/${idPlanificacion}/SprintHastaSemanalActual`, {
+        const response = await fetch(`${apiHost}/seguimientoSemanal/${idPlanificacion}/SprintHastaSemanalActual`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export const getSeguimiento = async (idPlanificacion) => {
 
 export const getSemanaSeguimiento = async (idEmpresa, idSemana) => {
     try {
-        const response = await fetch(`${apiHost}/api/empresa/${idEmpresa}/seguimientoSemanal/semana/${idSemana}`, {
+        const response = await fetch(`${apiHost}/empresa/${idEmpresa}/seguimientoSemanal/semana/${idSemana}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

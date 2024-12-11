@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import InfoSnackbar from '../../infoSnackbar/infoSnackbar'
 import {
   Modal,
@@ -138,8 +139,8 @@ const UserProfileModal = ({ openPerfil, cerrarPerfil, role }) => {
   
     const url =
       role === "docente"
-        ? "http://creativeharbor.tis.cs.umss.edu.bo/api/modificarDatosDocente"
-        : "http://creativeharbor.tis.cs.umss.edu.bo/api/modificarDatosEstudiante";
+        ? `${apiHost}/modificarDatosDocente`
+        : `${apiHost}/modificarDatosEstudiante`;
   
     try {
       const response = await updateDatosGenerico(url, payload);

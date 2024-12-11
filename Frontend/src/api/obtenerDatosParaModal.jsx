@@ -1,6 +1,6 @@
 const apiHost = import.meta.env.VITE_HOST;
 export const obtenerDatosDocente = async () => {
-    const url = `${apiHost}/api/obtenerDatosDocente`;
+    const url = `${apiHost}/obtenerDatosDocente`;
     const bodyFetch = {
       method: "GET",
       headers: {
@@ -38,7 +38,7 @@ export const obtenerDatosEstudiante = async () => {
 };
 
 export const updateDatosEstudiante = async (values) => {
-    const url = `${apiHost}/api/modificarDatosEstudiante`;
+    const url = `${apiHost}/modificarDatosEstudiante`;
     const bodyFetch = {
       method: "PUT",
       headers: {
@@ -58,7 +58,7 @@ export const updateDatosEstudiante = async (values) => {
 };
 
 export const updateDatosDocente = async (values) => {
-    const url = `${apiHost}/api/modificarDatosDocente`;
+    const url = `${apiHost}/modificarDatosDocente`;
     const bodyFetch = {
       method: "PUT",
       headers: {

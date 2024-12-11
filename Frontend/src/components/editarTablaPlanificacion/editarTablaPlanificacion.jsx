@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+const apiHost = import.meta.env.VITE_HOST;
 import { Fragment, useEffect, useState } from "react";
 import {
   Table,
@@ -266,7 +267,7 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
     };
     console.log(dataSprint);
     const response = await fetch(
-      "http://creativeharbor.tis.cs.umss.edu.bo/api/planificacion/guardarPlanificacion",
+      `${apiHost}/planificacion/guardarPlanificacion`,
       {
         method: "POST",
         headers: {
@@ -287,7 +288,7 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
     } else {
       console.log("Planificacion modificada con exito.");
       const responseSprint = await fetch(
-        "http://creativeharbor.tis.cs.umss.edu.bo/api/planificacion/guardarSprints",
+        `${apiHost}/planificacion/guardarSprints`,
         {
           method: "POST",
           headers: {
@@ -351,7 +352,7 @@ export default function EditarPlanificacion({ planificacionData, idEmpresa }) {
             entregables: entregables[index] || [], // Asignar entregables correspondiente o un array vacío
           }));
           const responseEntregables = await fetch(
-            "http://creativeharbor.tis.cs.umss.edu.bo/api/planificacion/guardarEntregables",
+            `${apiHost}/planificacion/guardarEntregables`,
             {
               method: "POST",
               headers: {
