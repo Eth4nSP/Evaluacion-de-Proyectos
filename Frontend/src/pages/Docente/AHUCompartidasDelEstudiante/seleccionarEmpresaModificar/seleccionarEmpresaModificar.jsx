@@ -50,7 +50,7 @@ function SeleccionarEmpresaModificar() {
       datosTabla={listaEmpresas}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack={`/`}
+      dirBack={`/homrDocente`}
       dirForward= {`/modificarPlanificacion/empresa/`}
       mensajeSearch = "Buscar empresa"
       nombreContador = "Empresas"
