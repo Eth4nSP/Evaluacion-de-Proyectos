@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import {useState, useEffect } from 'react';
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN';
 const columns = [
@@ -33,7 +34,7 @@ export default function DataTable() {
   const fetchEstudiantes = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/docente/listaEstudiantes?` +
+      const response = await fetch(`${apiHost}/docente/listaEstudiantes?` +
         new URLSearchParams({
           idGrupo,
         }),{

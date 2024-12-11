@@ -1,6 +1,7 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const getTodosLosGrupos = async () => {
     try {
-      const response = await fetch('http://creativeharbor.tis.cs.umss.edu.bo/api/grupos', {
+      const response = await fetch(`${apiHost}/grupos`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

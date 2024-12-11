@@ -1,3 +1,5 @@
+const apiHost = import.meta.env.VITE_HOST;
+
 import {
     Container,
     Box,
@@ -24,7 +26,7 @@ import { useState } from "react";
       
         console.log(nombreCuenta)
       try {
-        const response = await fetch('http://creativeharbor.tis.cs.umss.edu.bo/api/loginAdmin', {
+        const response = await fetch(`${apiHost}/loginAdmin`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

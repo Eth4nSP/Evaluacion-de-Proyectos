@@ -1,6 +1,7 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const getPlanificacion = async (idEmpresa) => {
   try {
-    const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/planificacion/${idEmpresa}`, {
+    const response = await fetch(`${apiHost}/planificacion/${idEmpresa}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { Fragment, useState, useEffect } from "react";
 import BaseUI from "../../../components/baseUI/baseUI";
 import { styled } from "@mui/material"; 
@@ -26,7 +27,7 @@ const PublicarGrupoEmpresa = () => {
     useEffect(() => {
         const fetchInformacion = async () => {
             try {
-                const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDatosEstEmpresa/${idEstudiante}`,{credentials: 'include'});
+                const response = await fetch(`${apiHost}/estudiante/getDatosEstEmpresa/${idEstudiante}`,{credentials: 'include'});
                 if (!response.ok) {
                     if (response.status === 404) {
                         setSnackbar({
@@ -105,7 +106,7 @@ const PublicarGrupoEmpresa = () => {
             return
         }
         try {
-            const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/crearGrupoEmpresa/paso3/${idEstudiante}`, {
+            const response = await fetch(`${apiHost}}/crearGrupoEmpresa/paso3/${idEstudiante}`, {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',

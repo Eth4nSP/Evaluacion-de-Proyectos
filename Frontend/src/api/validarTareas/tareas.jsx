@@ -1,6 +1,7 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const getTareaData = async (idTarea, idEmpresa) => {
   try {
-    const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/tarea/${idTarea}/${idEmpresa}`, {
+    const response = await fetch(`${apiHost}/tarea/${idTarea}/${idEmpresa}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -23,7 +24,7 @@ export const getTareaData = async (idTarea, idEmpresa) => {
 export const calificarTarea = async (idTarea, nota, comentario_docente) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/tarea/${idTarea}/calificar`,
+      `${apiHost}/tarea/${idTarea}/calificar`,
       {
         method: "POST",
         headers: {
@@ -66,7 +67,7 @@ export const updateTarea = async (idTarea, formData) => {
 
     // Enviar solicitud con FormData
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/tarea/${idTarea}/guardar`,
+      `${apiHost}/tarea/${idTarea}/guardar`,
       {
         method: "POST",
         body: data,
@@ -88,7 +89,7 @@ export const updateTarea = async (idTarea, formData) => {
 export const getTareasSemana = async (idEmpresa, idSemana) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/semana/${idSemana}/tareas`,
+      `${apiHost}/empresa/${idEmpresa}/semana/${idSemana}/tareas`,
       {
         method: "GET",
         headers: {
@@ -118,7 +119,7 @@ export const updateTareasSemana = async (
 ) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprint/${idSprint}/semana/${idSemana}/tareas`,
+      `${apiHost}/empresa/${idEmpresa}/sprint/${idSprint}/semana/${idSemana}/tareas`,
       {
         method: "PUT",
         headers: {

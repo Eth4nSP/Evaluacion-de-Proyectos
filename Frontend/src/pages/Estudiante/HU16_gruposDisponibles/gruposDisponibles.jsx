@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
@@ -6,7 +7,7 @@ import { Box, styled } from "@mui/material";
 
 const getGruposDocentes = async () => {
   try {
-    const response = await fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/gruposDocente", {
+    const response = await fetch(`${apiHost}/estudiante/gruposDocente`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -31,7 +32,7 @@ const getGruposDocentes = async () => {
 
 const estaMatriculado = async (idEstudiante) => {
   try {
-    const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estaMatriculado/${idEstudiante}`, {
+    const response = await fetch(`${apiHost}/estaMatriculado/${idEstudiante}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

@@ -1,5 +1,6 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const getOriginDocente = async () => {
-    const url = "http://creativeharbor.tis.cs.umss.edu.bo/api/docente/getGrupo";
+    const url = `${apiHost}/docente/getGrupo`;
     const bodyFetch = {
       method: "GET",
       headers: {

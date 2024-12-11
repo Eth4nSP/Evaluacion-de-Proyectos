@@ -1,5 +1,6 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const addRevision = async (idEmpresa, comentariopublico) => {
-  const response = await fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/addRevision", {
+  const response = await fetch(`${apiHost}/addRevision`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
