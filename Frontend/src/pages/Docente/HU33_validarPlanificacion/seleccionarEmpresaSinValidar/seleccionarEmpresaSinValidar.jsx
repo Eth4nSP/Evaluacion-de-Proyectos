@@ -8,7 +8,7 @@ function SeleccionarEmpresaSinValidar() {
         titulo = {'SELECCIONE UNA PLANIFICACION PARA VALIDAR'}
         ocultarAtras = {false}
         confirmarAtras = {false}
-        dirBack = {'/'}
+        dirBack = {'/homeDocente'}
         loading={false}
         error={{error:false}}
       >
