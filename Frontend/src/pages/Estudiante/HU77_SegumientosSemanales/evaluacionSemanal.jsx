@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { Fragment, useState, useEffect } from "react";
 import BaseUI from "../../../components/baseUI/baseUI.jsx";
 import TablaEvaluacionSemanal from "../../../components/tablaEvaluacionSemanal/tablaEvaluacionSemanal.jsx";
@@ -47,7 +48,7 @@ const EvaluarHito = () => {
 
     const getNombreEmpresa = async () => {
       try {
-          const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/nombreEmpresa/${idEmpresa}`, {
+          const response = await fetch(`${apiHost}/nombreEmpresa/${idEmpresa}`, {
               method: 'GET',
               headers: {
                   'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ const EvaluarHito = () => {
     };
     const getComentarios = async () => {
       try {
-          const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/seguimientoSemanalComentarios/semanaElegida/${idSemana}`, {
+          const response = await fetch(`${apiHost}/seguimientoSemanalComentarios/semanaElegida/${idSemana}`, {
               method: 'GET',
               headers: {
                   'Content-Type': 'application/json',

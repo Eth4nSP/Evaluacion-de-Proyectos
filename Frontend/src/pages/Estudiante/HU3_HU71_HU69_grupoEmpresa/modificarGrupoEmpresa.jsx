@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { Fragment, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BaseUI from "../../../components/baseUI/baseUI";
@@ -40,7 +41,7 @@ const ModificarGrupoEmpresa = () => {
     useEffect(() => {
         const fetchInformacion = async () => {
             try {
-                const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDatosEstEmpresa/${idEstudiante}`,{credentials: 'include'});
+                const response = await fetch(`${apiHost}/estudiante/getDatosEstEmpresa/${idEstudiante}`,{credentials: 'include'});
                 if (!response.ok) {
                     if (response.status === 404) {
                       setMensajeError("El estudiante no tiene empresa y no tiene registrada ninguna");
@@ -74,7 +75,7 @@ const ModificarGrupoEmpresa = () => {
 
         const fetchNuevosEstudiantes = async () => {
             try {
-                const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDisponibles/${idEstudiante}`,{credentials: 'include'});
+                const response = await fetch(`${apiHost}/estudiante/getDisponibles/${idEstudiante}`,{credentials: 'include'});
                 if (!response.ok) throw new Error('Error al recuperar datos');
     
                 const data = await response.json();
@@ -103,7 +104,7 @@ const ModificarGrupoEmpresa = () => {
 
         try {
             const estudiantesIds = integrantes.map(integrante => integrante.idEstudiante);
-            const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/crearGrupoEmpresa/paso2/${empresa.idEmpresa}`, {
+            const response = await fetch(`${apiHost}/crearGrupoEmpresa/paso2/${empresa.idEmpresa}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ integrantes: estudiantesIds }),

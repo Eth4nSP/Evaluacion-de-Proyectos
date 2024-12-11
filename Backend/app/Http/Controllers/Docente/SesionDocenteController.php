@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 
 class SesionDocenteController extends Controller
 {
-    public function getGrupoSesion() {
+    public function getGrupoSesion($idGrupo) {
         if ($idDocente = session('docente.id')) {
             $docente = Docente::find($idDocente);
             $nombreCompleto = trim("{$docente->nombreDocente} {$docente->primerApellido} {$docente->segundoApellido}");
@@ -19,13 +19,19 @@ class SesionDocenteController extends Controller
             $grupo = DB::table('grupo as g')
                 ->join('docente as d', 'g.idDocente', '=', 'd.idDocente')
                 ->where('d.idDocente', $idDocente)
-                ->whereRaw('CURDATE() >= g.fechaIniGestion')
-                ->whereRaw('CURDATE() <= g.fechaFinGestion')
+                //->whereRaw('CURDATE() >= g.fechaIniGestion')
+                //->whereRaw('CURDATE() <= g.fechaFinGestion')
+                ->where('g.idGrupo',$idGrupo)
                 ->select('g.idGrupo', 'g.fechaIniGestion', 'g.fechaLimiteEntregaEmpresa', 
                          'g.fechaLimiteEntregaPlanificacion', 'g.fechaFinPlanificacion', 
                          'g.fechaFinGestion', 'g.gestionGrupo', 'g.numGrupo') 
                 ->first();
-    
+
+                $docente = session()->get('docente', []);
+                // Agregar o actualizar el campo 'gestionGrupo' con los datos validados
+                $docente['gestionGrupo'] = $grupo->idGrupo;
+                // Actualizar la sesión con los datos modificados
+                session()->put('docente', $docente);
             if ($grupo) {
                 // Obtener el conteo de estudiantes en el grupo
                 $numEstudiantes = DB::table('estudiantesgrupos')

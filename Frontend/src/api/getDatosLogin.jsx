@@ -1,5 +1,8 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const getOriginDocente = async () => {
-    const url = "http://creativeharbor.tis.cs.umss.edu.bo/api/docente/getGrupo";
+    
+    const idGrupo = localStorage.getItem('idGrupo')
+    const url = `${apiHost}/docente/getGrupo/${idGrupo}`;
     const bodyFetch = {
       method: "GET",
       headers: {
@@ -7,12 +10,10 @@ export const getOriginDocente = async () => {
       },
       credentials: "include",
     };
-
     try {
       const res = await fetch(url, bodyFetch);
       const response = await res.json();
       console.log(response)  
-      localStorage.setItem('idGrupo', response.idGrupo);
       localStorage.setItem('nombreCompleto', response.nombreCompleto);
       localStorage.setItem('gestion', response.gestion);
       localStorage.setItem("fechaIniGestion", response.fechaIniGestion);

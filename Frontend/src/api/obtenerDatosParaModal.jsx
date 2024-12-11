@@ -1,5 +1,6 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const obtenerDatosDocente = async () => {
-    const url = "http://creativeharbor.tis.cs.umss.edu.bo/api/obtenerDatosDocente";
+    const url = `${apiHost}/obtenerDatosDocente`;
     const bodyFetch = {
       method: "GET",
       headers: {
@@ -18,7 +19,7 @@ export const obtenerDatosDocente = async () => {
 };
 
 export const obtenerDatosEstudiante = async () => {
-    const url = "http://creativeharbor.tis.cs.umss.edu.bo/api/obtenerDatosEstudiante";
+    const url = `${apiHost}/obtenerDatosEstudiante`;
     const bodyFetch = {
       method: "GET",
       headers: {
@@ -37,7 +38,7 @@ export const obtenerDatosEstudiante = async () => {
 };
 
 export const updateDatosEstudiante = async (values) => {
-    const url = "http://creativeharbor.tis.cs.umss.edu.bo/api/modificarDatosEstudiante";
+    const url = `${apiHost}/modificarDatosEstudiante`;
     const bodyFetch = {
       method: "PUT",
       headers: {
@@ -57,7 +58,7 @@ export const updateDatosEstudiante = async (values) => {
 };
 
 export const updateDatosDocente = async (values) => {
-    const url = "http://creativeharbor.tis.cs.umss.edu.bo/api/modificarDatosDocente";
+    const url = `${apiHost}/modificarDatosDocente`;
     const bodyFetch = {
       method: "PUT",
       headers: {

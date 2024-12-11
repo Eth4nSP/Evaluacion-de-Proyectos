@@ -11,8 +11,11 @@ import CardEvaluacion from '../../../components/cardsHome/cardDocente/cardEvalua
 import CardListaYDatos from '../../../components/cardsHome/cardDocente/cardListaYDatos.jsx';
 import Loading from '../../../components/loading/loading.jsx';
 import { getOriginDocente } from "../../../api/getDatosLogin.jsx";
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const navigate = useNavigate()
   useEffect(() => {
     const getDatosLogin = async () => {
         try {
@@ -38,10 +41,13 @@ function Home() {
   return (
     <>
       <Header />
-      <Title variant="h5" sx={{ marginTop: '5rem', textAlign: 'center' }}>
+      <Button variant="contained" color="primary" onClick={()=>navigate("/")} sx={{ marginTop:'5rem', marginLeft:'5rem'}}>
+        Volver a la lista de grupos
+      </Button>
+      <Title variant="h5" align="center">
         Bienvenid@, Ing. {localStorage.getItem('nombreCompleto')}
       </Title>
-      <Title variant="h6" sx={{ textAlign: 'center' }}>
+      <Title variant="h6" align="center">
         {localStorage.getItem('gestion')}
       </Title>
       <Container>

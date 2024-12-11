@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import {useState, useEffect } from 'react';
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN';
 const columns = [
@@ -33,7 +34,7 @@ export default function DataTable() {
   const fetchEstudiantes = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/docente/listaEstudiantes?` +
+      const response = await fetch(`${apiHost}/docente/listaEstudiantes?` +
         new URLSearchParams({
           idGrupo,
         }),{
@@ -45,11 +46,22 @@ export default function DataTable() {
         }
       );
       if (!response.ok) {
-        throw new Error('Error de grupo');
-      }
-
-      const data = await response.json();
-      setEstudiantes(data); 
+        console.log(response)
+        const errorData = await response.json();
+        console.log(errorData)
+        if (errorData.message === "No se encontraron estudiantes o docentes para este grupo.") {
+          setEstudiantes([]);
+        } else {
+          setError({
+            error: true,
+            errorMessage: errorData.message,
+            errorDetails: errorData,
+          });
+        }
+      }else{
+        const data = await response.json();
+        setEstudiantes(data);
+      } 
     } catch (err) {
       console.error('Error en la solicitud:', err);
       setError({

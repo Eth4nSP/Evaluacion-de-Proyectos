@@ -1,5 +1,5 @@
 // definir la url inicial de la api
-const BASE_URL = "http://creativeharbor.tis.cs.umss.edu.bo/api";
+const apiHost = import.meta.env.VITE_HOST;
 
 /**
  * modifica los datos para configurar una evaluacion final
@@ -7,7 +7,7 @@ const BASE_URL = "http://creativeharbor.tis.cs.umss.edu.bo/api";
  */
 export async function getDatosParaEvaluar(idEstudiante) {
     try {
-        const response = await fetch(`${BASE_URL}/getDatosParaEvaluar/${idEstudiante}`, {
+        const response = await fetch(`${apiHost}/getDatosParaEvaluar/${idEstudiante}`, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -30,7 +30,7 @@ export async function getDatosParaEvaluar(idEstudiante) {
 
 export async function evaluar(datosEvaluar) {
     try {
-        const response = await fetch(`${BASE_URL}/evaluar`, {
+        const response = await fetch(`${apiHost}/evaluar`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

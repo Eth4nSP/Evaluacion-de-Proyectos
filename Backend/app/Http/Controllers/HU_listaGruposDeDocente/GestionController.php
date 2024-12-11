@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\NuevaHUDeploy;
+namespace App\Http\Controllers\HU_listaGruposDeDocente;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +11,7 @@ class GestionController extends Controller{
         $result = DB::table('grupo as g')
         ->join('estudiantesgrupos as eg', 'g.idGrupo','=','eg.idGrupo')
         ->join('estudiante as e','eg.idEstudiante','=','e.idEstudiante')
-        ->select('g.gestionGrupo')
+        ->select('g.idGrupo as id','g.gestionGrupo')
         ->where('e.idEstudiante',$idEstudiante)
         ->get();
         
@@ -22,12 +22,10 @@ class GestionController extends Controller{
     public function visualizarSemestresDocente(){
         $idDocente = session('docente.id');
         $result = DB::table('grupo as g')
-        ->join('docente as d', 'g.idDocente','=','g.idDocente')
-        ->select('g.gestionGrupo')
+        ->join('docente as d', 'g.idDocente','=','d.idDocente')
+        ->select('g.idGrupo as id','g.gestionGrupo', 'g.fechaIniGestion', 'g.fechaFinGestion', 'g.numGrupo')
         ->where('d.idDocente',$idDocente)
         ->get();
-        
-
         return response()->json($result, 200);
     }
 
@@ -75,5 +73,22 @@ class GestionController extends Controller{
         return response()->json([
             'message' => 'Gestión creada con éxito.',
             'nuevaGestion' => $nuevaGestion,], 201);
-    }      
+    } 
+    
+    public function guardarGestionSeleccionadaDocente(Request $request){
+        // Validar los datos de entrada
+        $validatedData = $request->validate([
+            'gestionGrupo' => 'required|string' // Validación básica
+        ]);
+        // Obtener los datos existentes de la sesión 'docente'
+        $docente = session()->get('docente', []);
+    
+        // Agregar o actualizar el campo 'gestionGrupo' con los datos validados
+        $docente['gestionGrupo'] = $validatedData['gestionGrupo'];
+    
+        // Actualizar la sesión con los datos modificados
+        session()->put('docente', $docente);
+    
+        return response()->json(['message' => 'Gestión actualizada correctamente', 'docente' => $docente]);
+    }    
 }   

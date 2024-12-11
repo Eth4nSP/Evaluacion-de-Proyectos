@@ -1,7 +1,8 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const getSprintSemanas = async (idSprint) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/sprint/semana/${idSprint}`,
+      `${apiHost}/estudiante/sprint/semana/${idSprint}`,
       {
         method: "GET",
         headers: {
@@ -26,7 +27,7 @@ export const getSprintSemanas = async (idSprint) => {
 export const actualizarSprint = async (idSprint, comentario, nota) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/sprint/${idSprint}/actualizar`,
+      `${apiHost}/sprint/${idSprint}/actualizar`,
       {
         method: "POST",
         headers: {
@@ -55,7 +56,7 @@ export const actualizarSprint = async (idSprint, comentario, nota) => {
 export const aceptarEntregables = async (aceptados) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/aceptarEntregables`,
+      `${apiHost}/aceptarEntregables`,
       {
         method: "POST",
         headers: {
@@ -81,7 +82,7 @@ export const aceptarEntregables = async (aceptados) => {
 export const getSprintSemanasTareas = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprintsSemanasTareas`,
+      `${apiHost}/empresa/${idEmpresa}/sprintsSemanasTareas`,
       {
         method: "GET",
         headers: {

@@ -21,6 +21,7 @@ use App\Http\Controllers\Docente\SesionDocenteController;
 use App\Http\Controllers\Administrador\AdministradorController;
 use App\Http\Controllers\EvaluacionController;
 use App\Http\Controllers\EvaluacionesGrupoController;
+use App\Http\Controllers\HU_listaGruposDeDocente\GestionController;
 use App\Models\EvaluacionesGrupo;
 
 use App\Http\Controllers\RecuperarController;
@@ -199,7 +200,7 @@ Route::post('/sprint/{idSprint}/actualizar', [SprintController::class, 'actualiz
 // ============================      SESIONES DOCENTE     ======================================
 
 Route::get('/session/active/docente', [AuthController::class, 'isSessionActiveDocente']);
-Route::get('/docente/getGrupo', [SesionDocenteController::class, 'getGrupoSesion']);
+Route::get('/docente/getGrupo/{idGrupo}', [SesionDocenteController::class, 'getGrupoSesion']);
 
 // ============================      SESIONES ESTUDIANTE  ====================================
 
@@ -273,4 +274,13 @@ Route::post('/grupo/actualizar', [GrupoController::class, 'actualizarGrupo']);//
 Route::post('/recuperarContrasena', [RecuperarController::class, 'recuperarContrasena']);
 
 Route::post('/cambiarContrasena', [RecuperarController::class, 'cambiarContrasena']);
+
+// ================================= HU listaGruposDeDocente ========================
+Route::get('/docente/visualizarSemestres', [GestionController::class, 'visualizarSemestresDocente']);//utilizado
+
+Route::get('/estudiante/visualizarSemestres', [GestionController::class, 'visualizarSemestresEstudiante']);//utilizado
+
+
+Route::post('/docente/guardarGestionSeleccionada', [GestionController::class, 'guardarGestionSeleccionadaDocente']);
+
 

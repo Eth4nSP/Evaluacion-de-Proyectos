@@ -51,7 +51,7 @@ function EmpresasPorGrupo() {
           }
         console.log(url);
         const result = await fetchEmpresas(url);
-        if(!result.ok){
+        if(result.ok){
           console.log(result);
           setData(result);
           console.log('la data');
@@ -59,11 +59,6 @@ function EmpresasPorGrupo() {
         }else {
           const errorMessage = result.error;
           console.log(errorMessage);
-            setError({
-              error: true,
-              errorMessage: errorMessage,
-              errorDetails: errorMessage,
-            });
           }
       } catch (err) {
         setError({

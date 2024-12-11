@@ -1,4 +1,4 @@
-
+const apiHost = import.meta.env.VITE_HOST;
 import {useState} from "react";
 import {
   Button,
@@ -49,7 +49,7 @@ const CrearCuentaEstudiante = () => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      const response = await fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/crearCuentaEstudiante", {
+      const response = await fetch(`${apiHost}/crearCuentaEstudiante`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
