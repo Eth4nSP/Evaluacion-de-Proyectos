@@ -28,14 +28,14 @@ import VisualizarTarea from "../pages/Docente/HU38_tareaEstudiante/viualizarTare
 import VisualizarSprintEst from "../pages/Docente/HU38_tareaEstudiante/visualizarSprint.jsx";
 import VerEvaluacionSemanalSprints from '../pages/Docente/HU77_calificarEstudiante/listaSprintsVerCalificacionesSemanales.jsx'
 import VerEvaluacionSemanalListaEmpresas from '../pages/Docente/HU77_calificarEstudiante/listaEmpresasVerCalificaciones.jsx'
-import RedirigirHome from '../pages/Docente/homeGrupoDocente/redirigirHome.jsx';
 import ModificarFechasLimiteGrupo from '../pages/Docente/80_modificarFechasLimites/modificarFechasLimitesGrupo.jsx'
+import ListaGruposDocente from '../pages/Docente/homeGrupoDocente/listaGruposDocente.jsx'
 function NavDocente() {
   return (
     <Routes>
       <Route
         path="/"
-        element={<RedirigirHome/>}
+        element={<ListaGruposDocente/>}
       />
       <Route
         path="/homeDocente"
