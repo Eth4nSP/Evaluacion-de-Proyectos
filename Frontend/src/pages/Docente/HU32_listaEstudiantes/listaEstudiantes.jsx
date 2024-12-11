@@ -46,11 +46,22 @@ export default function DataTable() {
         }
       );
       if (!response.ok) {
-        throw new Error('Error de grupo');
-      }
-
-      const data = await response.json();
-      setEstudiantes(data); 
+        console.log(response)
+        const errorData = await response.json();
+        console.log(errorData)
+        if (errorData.message === "No se encontraron estudiantes o docentes para este grupo.") {
+          setEstudiantes([]);
+        } else {
+          setError({
+            error: true,
+            errorMessage: errorData.message,
+            errorDetails: errorData,
+          });
+        }
+      }else{
+        const data = await response.json();
+        setEstudiantes(data);
+      } 
     } catch (err) {
       console.error('Error en la solicitud:', err);
       setError({
