@@ -24,7 +24,7 @@ export default card;
 
 
 const StyledCard = styled(Card)({
-    width: "40vw",
+    width: "calc(30vw + 8rem)",
     padding: "1rem",
     margin:'1rem',
     borderRadius: "8px",
