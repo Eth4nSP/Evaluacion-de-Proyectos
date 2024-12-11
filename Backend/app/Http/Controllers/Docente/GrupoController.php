@@ -100,8 +100,8 @@ class GrupoController extends Controller
             ->leftjoin('empresa AS emp', 'ee.idEmpresa', '=', 'emp.idEmpresa')
             ->where('g.idGrupo',"=",   $idGrupo)
             //->where('grupo.gestionGrupo',$gestionGrupo) REEMPLAZAMOS
-            ->whereRaw('CURDATE() >= g.fechaIniGestion') // Usamos whereRaw para CURDATE()
-            ->whereRaw('CURDATE() <= g.fechaFinGestion') // Usamos whereRaw para CURDATE()
+            //->whereRaw('CURDATE() >= g.fechaIniGestion') // Usamos whereRaw para CURDATE()
+            //->whereRaw('CURDATE() <= g.fechaFinGestion') // Usamos whereRaw para CURDATE()
             ->select(
                 'g.numGrupo',
                 'e.idEstudiante as id',
@@ -128,6 +128,10 @@ class GrupoController extends Controller
 
 public function obtenerEmpresasPorGrupoYDocente()
     {
+        if (!session()->has('docente.id') || !session()->has('docente.gestionGrupo')) {
+            return response()->json(['error' => 'Datos de sesión incompletos'], 400);
+        }
+        
         $resultados = DB::table('estudiantesgrupos AS eg')
             ->join('grupo AS g', 'eg.idGrupo', '=', 'g.idGrupo')
             ->join('docente AS d', 'g.idDocente', '=', 'd.idDocente')
@@ -136,10 +140,11 @@ public function obtenerEmpresasPorGrupoYDocente()
             ->join('estudiante AS e', 'eg.idEstudiante', '=', 'e.idEstudiante')
             ->select('emp.idEmpresa as id','emp.nombreEmpresa', 'emp.nombreLargo', 'g.gestionGrupo', DB::raw('count(eg.idEstudiante) as totalEstudiantes'), 'g.numGrupo')
             ->where('d.idDocente', session('docente.id'))
+            ->where('g.idGrupo',session('docente.gestionGrupo'))
             // ->where('g.idGrupo', $request->idGrupo)
             //->where('g.gestionGrupo', $request->gestionGrupo)
-            ->whereRaw('CURDATE() >= g.fechaIniGestion') // Usamos whereRaw para CURDATE()
-            ->whereRaw('CURDATE() <= g.fechaFinGestion')
+            //->whereRaw('CURDATE() >= g.fechaIniGestion') // Usamos whereRaw para CURDATE()
+            //->whereRaw('CURDATE() <= g.fechaFinGestion')
             ->where('emp.publicada','=','1')
             ->groupBy('emp.nombreEmpresa', 'emp.nombreLargo', 'emp.idEmpresa', 'g.gestionGrupo', 'g.numGrupo')
             ->orderByDesc('g.gestionGrupo')

@@ -26,7 +26,12 @@ class SesionDocenteController extends Controller
                          'g.fechaLimiteEntregaPlanificacion', 'g.fechaFinPlanificacion', 
                          'g.fechaFinGestion', 'g.gestionGrupo', 'g.numGrupo') 
                 ->first();
-    
+
+                $docente = session()->get('docente', []);
+                // Agregar o actualizar el campo 'gestionGrupo' con los datos validados
+                $docente['gestionGrupo'] = $grupo->idGrupo;
+                // Actualizar la sesión con los datos modificados
+                session()->put('docente', $docente);
             if ($grupo) {
                 // Obtener el conteo de estudiantes en el grupo
                 $numEstudiantes = DB::table('estudiantesgrupos')
