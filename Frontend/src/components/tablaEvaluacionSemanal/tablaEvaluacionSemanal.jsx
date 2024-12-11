@@ -1,4 +1,5 @@
 /* eslint-disable react/prop-types */
+const apiHost = import.meta.env.VITE_HOST;
 import { useState, useEffect } from "react";
 import {
   Table,
@@ -84,7 +85,7 @@ const TablaEvaluacionSemanal = ({ semana, comentariosN, showButtons = true, setS
     const comentariosNoSubidos = comentarios.filter((comentario)=> comentario.subido === false && comentario.comentario !== '')
     try {  
       const response = await fetch(
-        `http://creativeharbor.tis.cs.umss.edu.bo/api/docente/evaluacion`,
+        `${apiHost}/docente/evaluacion`,
         {
           method: "POST",
           headers: {

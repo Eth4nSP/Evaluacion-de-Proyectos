@@ -2,7 +2,7 @@ const apiHost = import.meta.env.VITE_HOST;
 import Cookies from 'js-cookie';
 export const logout = async () => {
     try {
-        await fetch(`${apiHost}/api/logout`, {
+        await fetch(`${apiHost}/logout`, {
             method: 'POST',
             headers: {
                 'Authorization': true,
