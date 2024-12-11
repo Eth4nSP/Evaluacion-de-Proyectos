@@ -1,5 +1,6 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const publicarPlanificacion = async (idEmpresa) => {
-    const response = await fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/publicarPlanificacion", {
+    const response = await fetch(`${apiHost}/publicarPlanificacion`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

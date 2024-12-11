@@ -1,5 +1,6 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const validar = async (idEmpresa) => {
-  const validarResponse = await fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/validar", {
+  const validarResponse = await fetch(`${apiHost}/validar`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",

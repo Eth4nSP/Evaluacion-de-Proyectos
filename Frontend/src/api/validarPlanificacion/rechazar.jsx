@@ -1,5 +1,6 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const rechazar = async (idEmpresa) => {
-    const rechazarResponse = await fetch("http://creativeharbor.tis.cs.umss.edu.bo/api/rechazar", {
+    const rechazarResponse = await fetch(`${apiHost}/rechazar`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

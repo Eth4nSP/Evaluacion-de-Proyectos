@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { useEffect, useState } from "react";
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN'
 
@@ -27,7 +28,7 @@ function ListaEmpresasEvaluacionSemanal() {
     setLoading(true);
     const fetchEmpresas = async () => {
       try {
-        const url = 'http://creativeharbor.tis.cs.umss.edu.bo/api/empresasSinSemanaCalificada'
+        const url = `${apiHost}/empresasSinSemanaCalificada`
         const body = {
           method: 'GET',
           headers: {

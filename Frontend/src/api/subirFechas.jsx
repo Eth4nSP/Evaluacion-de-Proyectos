@@ -1,5 +1,6 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const fechasSubmit = async (valores) => {
-        const response = await fetch('http://creativeharbor.tis.cs.umss.edu.bo/api/grupo/actualizar', {
+        const response = await fetch(`${apiHost}}/api/grupo/actualizar`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

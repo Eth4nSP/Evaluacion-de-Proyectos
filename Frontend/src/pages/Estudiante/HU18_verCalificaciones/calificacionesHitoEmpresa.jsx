@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import BaseUI from '../../../components/baseUI/baseUI';
@@ -26,7 +27,7 @@ const NotaSprintTable = () => {
   const fetchNotas = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprints-estudiantes`,{credentials: 'include'});
+      const response = await fetch(`${apiHost}/empresa/${idEmpresa}/sprints-estudiantes`,{credentials: 'include'});
       if (!response.ok) {
         throw new Error('Error al obtener los datos.');
       }
@@ -42,7 +43,7 @@ const NotaSprintTable = () => {
   const getNombreEmpresa = async (idEmpresa) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://creativeharbor.tis.cs.umss.edu.bo/api/nombreEmpresa/${idEmpresa}`,{credentials: 'include'});
+      const response = await fetch(`${apiHost}/nombreEmpresa/${idEmpresa}`,{credentials: 'include'});
       if (!response.ok) {
         throw new Error('Error al obtener los datos de la empresa');
       }

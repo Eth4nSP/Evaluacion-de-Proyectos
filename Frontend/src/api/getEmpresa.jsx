@@ -1,7 +1,8 @@
+const apiHost = import.meta.env.VITE_HOST;
 export const getEmpresaData = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}`,
+      `${apiHost}/empresa/${idEmpresa}`,
       {
         method: "GET",
         headers: {
@@ -26,7 +27,7 @@ export const getEmpresaData = async (idEmpresa) => {
 export const getEmpresaCalificaciones = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresas/notasSprint/${idEmpresa}`,
+      `${apiHost}/empresas/notasSprint/${idEmpresa}`,
       {
         method: "GET",
         headers: {
@@ -51,7 +52,7 @@ export const getEmpresaCalificaciones = async (idEmpresa) => {
 export const getSprintsEntregables = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprintsEntregables`,
+      `${apiHost}/empresa/${idEmpresa}/sprintsEntregables`,
       {
         method: "GET",
         headers: {
@@ -76,7 +77,7 @@ export const getSprintsEntregables = async (idEmpresa) => {
 export const getSprintConEntregables = async (idSprint) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/sprintConEntregables/${idSprint}`,
+      `${apiHost}/empresa/sprintConEntregables/${idSprint}`,
       {
         method: "GET",
         headers: {
@@ -101,7 +102,7 @@ export const getSprintConEntregables = async (idSprint) => {
 export const getSemanasTareas = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/semanasTareas`,
+      `${apiHost}/empresa/${idEmpresa}/semanasTareas`,
       {
         method: "GET",
         headers: {
@@ -128,7 +129,7 @@ export const getSemanasTareas = async (idEmpresa) => {
 export const getSemanaActualTareas= async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprintSemanaActualTareas`,
+      `${apiHost}/empresa/${idEmpresa}/sprintSemanaActualTareas`,
       {
         method: "GET",
         headers: {
@@ -155,7 +156,7 @@ export const getSemanaActualTareas= async (idEmpresa) => {
 export const getEmpresasPorGrupo = async (idGrupo) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/grupo/${idGrupo}/empresas`,
+      `${apiHost}/grupo/${idGrupo}/empresas`,
       {
         method: "GET",
         headers: {
@@ -180,7 +181,7 @@ export const getEmpresasPorGrupo = async (idGrupo) => {
 export const getSprintsYEstudiantesPorEmpresa = async (idEmpresa) => {
   try {
     const response = await fetch(
-      `http://creativeharbor.tis.cs.umss.edu.bo/api/empresa/${idEmpresa}/sprints-estudiantes`,
+      `${apiHost}/empresa/${idEmpresa}/sprints-estudiantes`,
       {
         method: "GET",
         headers: {

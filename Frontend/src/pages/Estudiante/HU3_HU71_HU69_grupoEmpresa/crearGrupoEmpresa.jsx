@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { Fragment, useState, useEffect } from "react";
 import BaseUI from "../../../components/baseUI/baseUI";
 import { styled } from "@mui/material";
@@ -33,7 +34,7 @@ const CrearGrupoEmpresa = () => {
     const fetchEstudiante = async (idEstudiante) => {
       try {
         const response = await fetch(
-          `http://creativeharbor.tis.cs.umss.edu.bo/api/estudiante/getDatosEst/${idEstudiante}`,{credentials: 'include'}
+          `${apiHost}}/estudiante/getDatosEst/${idEstudiante}`,{credentials: 'include'}
         );
         if (!response.ok) throw new Error("Error al recuperar estudiante");
         const data = await response.json();
@@ -61,7 +62,7 @@ const CrearGrupoEmpresa = () => {
     if (nombreLargo && nombreCorto && estudiante.idEstudiante) {
       try {
         const response = await fetch(
-          "http://creativeharbor.tis.cs.umss.edu.bo/api/crearGrupoEmpresa/paso1",
+          `${apiHost}/crearGrupoEmpresa/paso1`,
           {
             method: "POST",
             headers: {

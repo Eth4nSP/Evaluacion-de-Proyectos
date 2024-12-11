@@ -1,5 +1,5 @@
 // definir la url inicial de la api
-const BASE_URL = 'http://creativeharbor.tis.cs.umss.edu.bo/api';
+const apiHost = import.meta.env.VITE_HOST;
 
 /**
  * Obtiene las planificaciones que no fueron publicadas
@@ -7,7 +7,7 @@ const BASE_URL = 'http://creativeharbor.tis.cs.umss.edu.bo/api';
  */
 export async function getPlanificacionesSinPublicar() {
     try {
-        const response = await fetch(`${BASE_URL}/planificacionesSinPublicar`, {
+        const response = await fetch(`${apiHost}/planificacionesSinPublicar`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,7 +36,7 @@ export async function getPlanificacionesSinPublicar() {
  */
 export async function getPlanificacionesParaModificar() {
     try {
-        const response = await fetch(`${BASE_URL}/planificacionesParaModificar`, {
+        const response = await fetch(`${apiHost}/planificacionesParaModificar`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -65,7 +65,7 @@ export async function getPlanificacionesParaModificar() {
  */
 export async function getListaSprintsPorIdEmpresa(idEmpresa) {
     try {
-        const response = await fetch(`${BASE_URL}/getListaSprintsPorIdEmpresa?idEmpresa=${idEmpresa}`, {
+        const response = await fetch(`${apiHost}/getListaSprintsPorIdEmpresa?idEmpresa=${idEmpresa}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

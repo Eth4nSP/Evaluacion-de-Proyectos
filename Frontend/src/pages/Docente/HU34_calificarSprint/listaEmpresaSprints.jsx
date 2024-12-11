@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { useState, useEffect } from 'react';
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN';
 import BaseUI from '../../../components/baseUI/baseUI';
@@ -27,7 +28,7 @@ function ListaEmpresaSprints() {
     useEffect(() => {
         const fetchData = async () => {
           try {
-            const url = 'http://creativeharbor.tis.cs.umss.edu.bo/api/empresasSinSprintCalificado'
+            const url = `${apiHost}/empresasSinSprintCalificado`
             const body = {
               method: 'GET',
               headers: {
