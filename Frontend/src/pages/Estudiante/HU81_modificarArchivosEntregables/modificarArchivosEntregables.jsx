@@ -197,7 +197,13 @@ function CalificarSprintU() {
     );
 
   return (
-    <BaseUI titulo={"MODIFICAR ARCHIVOS ENTREGABLES SPRINT"} loading={loading} error={error}>
+    <BaseUI 
+      confirmarAtras={true} 
+      dirBack={'/homeEstu'} 
+      titulo={"MODIFICAR ARCHIVOS ENTREGABLES SPRINT"} 
+      loading={loading} 
+      error={error}
+    >
       <Container>
         <Box>
           <Typography variant="h4" className="titulo">
