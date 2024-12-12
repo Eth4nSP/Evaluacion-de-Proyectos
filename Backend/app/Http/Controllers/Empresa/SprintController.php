@@ -77,28 +77,42 @@ class SprintController extends Controller
         }
     }   
     public function actualizarEntregable(Request $request): JsonResponse
-    {
-        try {
-            $idEntregables = $request->input('idEntregables');
-            $archivoEntregable = $request->input('archivoEntregable');
-            $nombreArchivo = $request->input('nombreArchivo');
-            $fechaEntrega = $request->input('fechaEntrega');
-    
+{
+    try {
+        // Recibir el array de entregables
+        $entregables = $request->input('entregables'); // Suponemos que el array de entregables viene con las claves correctas
+
+        // Validar si el array está vacío
+        if (empty($entregables)) {
+            return response()->json(['error' => 'No se proporcionaron entregables para actualizar.'], 400);
+        }
+
+        // Iterar sobre cada entregable y actualizar
+        foreach ($entregables as $data) {
+            $idEntregable = $data['idEntregables'];
+            $archivoEntregable = $data['archivoEntregable'];
+            $nombreArchivo = $data['nombreArchivo'];
+
             // Buscar el entregable por id
-            $entregable = Entregables::findOrFail($idEntregables);
-    
+            $entregable = Entregables::findOrFail($idEntregable);
+
             // Validar y asignar valores
             $entregable->archivoEntregable = empty($archivoEntregable) ? null : $archivoEntregable;
             $entregable->nombreArchivo = empty($nombreArchivo) ? null : $nombreArchivo;
-            $entregable->fechaEntrega = empty($fechaEntrega) ? null : $fechaEntrega;
-    
+
+            // Guardar los cambios
             $entregable->save();
-    
-            return response()->json(['message' => 'Entregable actualizado correctamente'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al actualizar el entregable: ' . $e->getMessage()], 500);
         }
+
+        // Responder con mensaje de éxito
+        return response()->json(['message' => 'Entregables actualizados correctamente'], 200);
+
+    } catch (\Exception $e) {
+        // Manejo de excepciones
+        return response()->json(['error' => 'Error al actualizar los entregables: ' . $e->getMessage()], 500);
     }
+}
+
     public function empresasSinSprintCalificado(): JsonResponse
     {
         $empresas = DB::table('empresa as e')

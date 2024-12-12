@@ -116,7 +116,7 @@ export const actualizarEntregable = async (data) => {
       throw new Error('Error al actualizar el entregable');
     }
 
-    return await response.json();
+    return response;
   } catch (error) {
     console.error('Error en la solicitud:', error);
     throw error;

@@ -19,7 +19,7 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ImageIcon from "@mui/icons-material/Image";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-import GetAppIcon from "@mui/icons-material/GetApp";
+import {actualizarEntregable} from "../../../api/getEmpresa";
 import ClearIcon from "@mui/icons-material/Clear";
 const UploadContainer = styled(Box)(({ theme }) => ({
   display: "flex",
@@ -141,7 +141,7 @@ function CalificarSprintU() {
         return {
           ...entregable,
           nombreArchivo: uploadedFile.name,
-          archivo: newArchivo,
+          archivoEntregable: newArchivo,
         };
       })
     );
@@ -154,13 +154,31 @@ function CalificarSprintU() {
   
   const handleSave = async () => {
     try {
-      console.log("Payload to submit:", datosSprint.entregables);
-      setSnackbar({
-        open: true,
-        message: "Entregables enviados correctamente.",
-        severity: "success",
-        autoHide: 6000,
+      const entregables = datosSprint.entregables.map((entregable, i) => {
+        return {
+          idEntregables: entregable.idEntregables,
+          nombreArchivo: entregable.nombreArchivo,
+          archivoEntregable: entregable.archivoEntregable,
+        };
       });
+      console.log("entregables", entregables)
+      const response = await actualizarEntregable({entregables: entregables});
+      console.log("response", response)
+      if (response.ok) {
+        setSnackbar({
+          open: true,
+          message: "Entregables enviados correctamente.",
+          severity: "success",
+          autoHide: 6000,
+        });
+      }else {
+        setSnackbar({
+          open: true,
+          message: "Error al enviar los entregables.",
+          severity: "error",
+          autoHide: 6000,
+        });
+      }
     } catch (error) {
       console.error("Error al enviar entregables:", error);
       setSnackbar({
@@ -273,7 +291,7 @@ function CalificarSprintU() {
       return {
         ...entregable,
         nombreArchivo: null,
-        archivo: null
+        archivoEntregable: null
       };
     });
     
