@@ -88,51 +88,31 @@ function CalificarSprintU() {
     onConfirm: () => {},
   });
 
-  const fetchFileFromServer = async (url, fileName) => {
-    try {
-      const response = await fetch(url, {
-        method: 'GET',
-        credentials: 'include',  // Asegura que las cookies se envíen
-      });
-  
-      if (!response.ok) {
-        throw new Error('Error al descargar el archivo');
-      }
-  
-      const blob = await response.blob();
-      const file = new File([blob], fileName, { type: blob.type });
-      return file;
-    } catch (error) {
-      console.error("Error al descargar el archivo:", error);
-      return null;
-    }
-  };
-  
-  
   const fetchSprints = async () => {
     try {
       const sprintData = await getSprintConEntregables(idSprint);
       setDatosSprint(sprintData.sprints);
-  
-      const newArchivos = await Promise.all(
-        sprintData.sprints.entregables.map(async (entregable) => {
-          if (entregable.archivoEntregable) {
-            const archivo = await fetchFileFromServer(
-              entregable.archivoEntregable,
-              entregable.nombreArchivo
-            );
-            if (archivo) {
-              return {
-                ...archivo,
-              };
-            }
-          }
+      
+      const newArchivos = sprintData.sprints.entregables.map((entregable) => {
+        if (entregable.archivoEntregable !== null) {
+          const archivo = entregable.archivoEntregable;
+          return {
+            name: entregable.nombreArchivo,
+            lastModified: new Date(),
+            lastModifiedDate: new Date(),
+            size: 10000000, // 1 MB
+            type: entregable.nombreArchivo.split(".").pop(),
+            webkitRelativePath: archivo || null,
+            isUploaded: false,  // Marcamos estos archivos como no subidos
+          };
+        } else {
           return null;
-        })
-      );
+        }
+      });
   
       setArchivos(newArchivos);
       setLoading(false);
+      console.log(newArchivos)
     } catch (error) {
       setError({
         error: true,
@@ -154,6 +134,7 @@ function CalificarSprintU() {
     
     newArchivos[index] = {
       ...uploadedFile,
+      isUploaded: true,  // Agregamos una propiedad para identificarlo
     };
     
     setArchivos(newArchivos);
@@ -246,12 +227,50 @@ function CalificarSprintU() {
 
 
   const handleDownloadFile = async (file) => {
+    if (file.isUploaded) {
+      // Si es un archivo subido por el usuario
       const url = URL.createObjectURL(file);
       const a = document.createElement('a');
       a.href = url;
       a.download = file.name;
       a.click();
       URL.revokeObjectURL(url);
+    } else {
+      // Si es un archivo del servidor (obtenido mediante fetch)
+      try {
+        const url = file.webkitRelativePath || ''; // Asegúrate de que la URL esté presente
+          if (url) {
+              // Crea un enlace de anclaje (<a>)
+              const a = document.createElement('a');
+              
+              // Asigna la URL al atributo 'href' del enlace
+              a.href = url;
+              
+              // Establece el atributo 'download' si deseas que el archivo se descargue
+              a.download = file.name || 'archivo';
+
+              // Simula el clic en el enlace
+              a.click();
+          }
+         else {
+          console.error("No se pudo obtener la URL del archivo del servidor.");
+          setSnackbar({
+            open: true,
+            message: "No se encontró la URL del archivo.",
+            severity: "error",
+            autoHide: 6000,
+          });
+        }
+      } catch (error) {
+        console.error("Error al intentar descargar el archivo:", error);
+        setSnackbar({
+          open: true,
+          message: `Error al descargar el archivo: ${error.message}`,
+          severity: "error",
+          autoHide: 6000,
+        });
+      }
+    }
   };
   
   
