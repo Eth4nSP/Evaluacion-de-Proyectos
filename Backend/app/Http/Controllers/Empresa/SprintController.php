@@ -50,6 +50,7 @@ class SprintController extends Controller
                                 'nombreArchivo' => $entregable->null,
                                 'aceptado' => $entregable->aceptado,
                                 'archivoEntregable' => null, // Retorna null si no hay archivo
+                                'tamanioArchivo' => null,  // Retorna null si no hay archivo
                             ];
                         }
                         // Decodificar el archivo Base64
@@ -59,6 +60,7 @@ class SprintController extends Controller
 
                         // Guardar el archivo decodificado en el almacenamiento
                         Storage::put($rutaArchivo, $contenidoArchivo);
+                        $tamanioArchivo = Storage::size($rutaArchivo);
 
                         // Generar la URL para el archivo
                         return [
@@ -67,6 +69,7 @@ class SprintController extends Controller
                             'nombreArchivo' => $entregable->nombreArchivo,
                             'aceptado' => $entregable->aceptado,
                             'archivoEntregable' => url(Storage::url($rutaArchivo)), // URL completa al archivo
+                            'tamanioArchivo' => $tamanioArchivo, // Tamaño del archivo en bytes
                         ];
                     }),
                 ];

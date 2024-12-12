@@ -21,7 +21,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import {actualizarEntregable} from "../../../api/getEmpresa";
 import ClearIcon from "@mui/icons-material/Clear";
-const UploadContainer = styled(Box)(({ theme }) => ({
+const UploadContainer = styled(Box)(({ theme, hasFile }) => ({
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
@@ -29,7 +29,7 @@ const UploadContainer = styled(Box)(({ theme }) => ({
   border: `2px dashed ${theme.palette.primary.main}`,
   borderRadius: theme.spacing(0.5),
   padding: theme.spacing(2),
-  cursor: "pointer",
+  cursor: hasFile ? "default" : "pointer",
   transition: "0.3s ease",
   "&:hover": {
     backgroundColor: theme.palette.action.hover,
@@ -55,7 +55,6 @@ const FileItem = styled(Box)(({ theme }) => ({
 const FileInfo = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
-  marginLeft: theme.spacing(2),
   overflow:'hidden',
   textOverflow:'ellipsis'
 }));
@@ -91,7 +90,7 @@ function CalificarSprintU() {
     try {
       const sprintData = await getSprintConEntregables(idSprint);
       setDatosSprint(sprintData.sprints);
-      
+      console.log(sprintData.sprints.entregables);  
       const newArchivos = sprintData.sprints.entregables.map((entregable) => {
         if (entregable.archivoEntregable !== null) {
           const archivo = entregable.archivoEntregable;
@@ -99,10 +98,10 @@ function CalificarSprintU() {
             name: entregable.nombreArchivo,
             lastModified: new Date(),
             lastModifiedDate: new Date(),
-            size: 10000000, // 1 MB
+            size: Number(entregable.tamanioArchivo) , // 1 MB
             type: entregable.nombreArchivo.split(".").pop(),
             webkitRelativePath: archivo || null,
-            isUploaded: false,  // Marcamos estos archivos como no subidos
+            isUploaded: false,
           };
         } else {
           return null;
@@ -267,9 +266,8 @@ function CalificarSprintU() {
       a.click();
       URL.revokeObjectURL(url);
     } else {
-      // Si es un archivo del servidor (obtenido mediante fetch)
       try {
-        const url = file.webkitRelativePath || ''; // Asegúrate de que la URL esté presente
+        const url = file.webkitRelativePath || '';
           if (url) {
               const a = document.createElement('a');
               a.href = url;
@@ -378,7 +376,7 @@ function CalificarSprintU() {
                 <Typography>{entregable.descripcionEntregable}</Typography>
               </Box>
               <Box>
-                <UploadContainer sx={{width:'calc(18vw + 6rem)', display:"flex", minWidth:'calc(18vw + 6rem)', maxWidth:'calc(18vw + 6rem)'}}>
+                <UploadContainer hasFile={archivos[index]!==null} sx={{width:'calc(18vw + 6rem)', display:"flex", minWidth:'calc(18vw + 6rem)', maxWidth:'calc(18vw + 6rem)'}}>
                   <input
                     type="file"
                     id={`file-upload-${index}`}
@@ -387,7 +385,7 @@ function CalificarSprintU() {
                   />
                   {archivos[index] ? (
                     <FileItem sx={{margin:'0', padding:'0', width:'auto', maxWidth:'calc(18vw + 6rem)', justifyContent:"start"}}>   
-                      <IconButton onClick={() => handleDownloadFile(archivos[index])}>
+                      <IconButton onClick={() => handleDownloadFile(archivos[index])} sx={{marginLeft:'0'}}>
                         {selectFileIcon(archivos[index].name)}
                       </IconButton>
                       <FileInfo>
@@ -395,6 +393,7 @@ function CalificarSprintU() {
                           noWrap
                           color="blue"
                           onClick={() => handleDownloadFile(archivos[index])}
+                          sx={{textDecoration:'underline', cursor:'pointer'}}
                         >
                           {archivos[index].name}
                         </Typography>
