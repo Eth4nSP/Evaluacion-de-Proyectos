@@ -13,6 +13,7 @@ use App\Models\Semana;
 use App\Models\Tarea;
 use App\Models\Empresa;
 use App\Models\NotaSprint;
+use App\Models\Entregables;
 use App\Http\Controllers\Controller;
 use App\Models\NotaTareasEstudiante;
 use App\Models\ComentarioTarea;
@@ -75,6 +76,29 @@ class SprintController extends Controller
             return response()->json(['error' => 'Error al obtener los sprints y entregables: ' . $e->getMessage()], 500);
         }
     }   
+    public function actualizarEntregable(Request $request): JsonResponse
+    {
+        try {
+            $idEntregables = $request->input('idEntregables');
+            $archivoEntregable = $request->input('archivoEntregable');
+            $nombreArchivo = $request->input('nombreArchivo');
+            $fechaEntrega = $request->input('fechaEntrega');
+    
+            // Buscar el entregable por id
+            $entregable = Entregables::findOrFail($idEntregables);
+    
+            // Validar y asignar valores
+            $entregable->archivoEntregable = empty($archivoEntregable) ? null : $archivoEntregable;
+            $entregable->nombreArchivo = empty($nombreArchivo) ? null : $nombreArchivo;
+            $entregable->fechaEntrega = empty($fechaEntrega) ? null : $fechaEntrega;
+    
+            $entregable->save();
+    
+            return response()->json(['message' => 'Entregable actualizado correctamente'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al actualizar el entregable: ' . $e->getMessage()], 500);
+        }
+    }
     public function empresasSinSprintCalificado(): JsonResponse
     {
         $empresas = DB::table('empresa as e')
