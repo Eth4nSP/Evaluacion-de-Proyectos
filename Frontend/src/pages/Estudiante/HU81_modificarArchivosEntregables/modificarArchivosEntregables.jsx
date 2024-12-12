@@ -49,7 +49,6 @@ const FileItem = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: theme.spacing(0.5),
   width: "100%",
-  flexWrap:'wrap',
   backgroundColor: theme.palette.background.paper,
 }));
 
@@ -131,12 +130,8 @@ function CalificarSprintU() {
   const handleFileChange = async (event, index) => {
     const newArchivos = [...archivos];
     const uploadedFile = event.target.files[0];
-    
-    newArchivos[index] = {
-      ...uploadedFile,
-      isUploaded: true,  // Agregamos una propiedad para identificarlo
-    };
-    
+    newArchivos[index] = uploadedFile
+    console.log(newArchivos)
     setArchivos(newArchivos);
     
     const entregables = await Promise.all(
@@ -227,7 +222,7 @@ function CalificarSprintU() {
 
 
   const handleDownloadFile = async (file) => {
-    if (file.isUploaded) {
+    if (file.isUploaded!==false) {
       // Si es un archivo subido por el usuario
       const url = URL.createObjectURL(file);
       const a = document.createElement('a');
@@ -274,10 +269,11 @@ function CalificarSprintU() {
   };
   
   
-  const handleRemoveFile = async(index) => {
+  const handleRemoveFile = (index) => {
     const newArchivos = [...archivos];
     newArchivos[index] = null;
     setArchivos(newArchivos);
+    console.log(newArchivos)
     const entregables = datosSprint.entregables.map((entregable, i) => {
       if (i !== index) return entregable;
       return {
@@ -286,6 +282,7 @@ function CalificarSprintU() {
         archivo: null
       };
     });
+    
     setDatosSprint({
       ...datosSprint,
       entregables,
@@ -346,7 +343,7 @@ function CalificarSprintU() {
         <Paper className="entregables">
           <Typography variant="h6">Entregables</Typography>
           {datosSprint.entregables.map((entregable, index) => (
-            <FileItem key={index}>
+            <FileItem key={index} sx={{flexWrap:'wrap'}}>
               <Box>
                 <Typography>{entregable.descripcionEntregable}</Typography>
               </Box>
