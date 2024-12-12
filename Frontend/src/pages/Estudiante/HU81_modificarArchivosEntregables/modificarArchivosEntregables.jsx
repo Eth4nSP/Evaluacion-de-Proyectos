@@ -49,6 +49,7 @@ const FileItem = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   borderRadius: theme.spacing(0.5),
   width: "100%",
+  flexWrap:'wrap',
   backgroundColor: theme.palette.background.paper,
 }));
 
@@ -87,11 +88,51 @@ function CalificarSprintU() {
     onConfirm: () => {},
   });
 
+  const fetchFileFromServer = async (url, fileName) => {
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        credentials: 'include',  // Asegura que las cookies se envíen
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error al descargar el archivo');
+      }
+  
+      const blob = await response.blob();
+      const file = new File([blob], fileName, { type: blob.type });
+      return file;
+    } catch (error) {
+      console.error("Error al descargar el archivo:", error);
+      return null;
+    }
+  };
+  
+  
   const fetchSprints = async () => {
     try {
       const sprintData = await getSprintConEntregables(idSprint);
       setDatosSprint(sprintData.sprints);
-      setArchivos(sprintData.sprints.entregables.map(() => null));
+  
+      const newArchivos = await Promise.all(
+        sprintData.sprints.entregables.map(async (entregable) => {
+          if (entregable.archivoEntregable) {
+            const archivo = await fetchFileFromServer(
+              entregable.archivoEntregable,
+              entregable.nombreArchivo
+            );
+            if (archivo) {
+              return {
+                ...archivo,
+              };
+            }
+          }
+          return null;
+        })
+      );
+  
+      setArchivos(newArchivos);
+      setLoading(false);
     } catch (error) {
       setError({
         error: true,
@@ -99,34 +140,42 @@ function CalificarSprintU() {
         errorDetails: error.message,
       });
       console.error("Error al cargar la tarea:", error);
-    } finally {
-      setLoading(false);
     }
   };
+  
 
   useEffect(() => {
     fetchSprints();
   }, []);
 
-  const handleFileChange = async(event, index) => {
+  const handleFileChange = async (event, index) => {
     const newArchivos = [...archivos];
-    newArchivos[index] = event.target.files[0];
+    const uploadedFile = event.target.files[0];
+    
+    newArchivos[index] = {
+      ...uploadedFile,
+    };
+    
     setArchivos(newArchivos);
-    const entregables = await Promise.all(datosSprint.entregables.map(async(entregable, i) => {
-      if (i !== index) return entregable;
-      const newArchivo = await convertFileToBase64(event.target.files[0]);
-      return {
-        ...entregable,
-        nombreArchivo: event.target.files[0].name,
-        archivo: newArchivo
-      };
-    }));
+    
+    const entregables = await Promise.all(
+      datosSprint.entregables.map(async (entregable, i) => {
+        if (i !== index) return entregable;
+        const newArchivo = await convertFileToBase64(uploadedFile);
+        return {
+          ...entregable,
+          nombreArchivo: uploadedFile.name,
+          archivo: newArchivo,
+        };
+      })
+    );
+  
     setDatosSprint({
       ...datosSprint,
       entregables,
     });
   };
-
+  
   const handleSave = async () => {
     try {
       console.log("Payload to submit:", datosSprint.entregables);
@@ -196,14 +245,15 @@ function CalificarSprintU() {
   };
 
 
-  const handleDownloadFile = (file) => {
-    const url = URL.createObjectURL(file);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = file.name;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleDownloadFile = async (file) => {
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      URL.revokeObjectURL(url);
   };
+  
   
   const handleRemoveFile = async(index) => {
     const newArchivos = [...archivos];
@@ -282,7 +332,7 @@ function CalificarSprintU() {
                 <Typography>{entregable.descripcionEntregable}</Typography>
               </Box>
               <Box>
-                <UploadContainer sx={{width:'20rem', display:"flex", minWidth:'20rem', maxWidth:'20rem'}}>
+                <UploadContainer sx={{width:'calc(18vw + 6rem)', display:"flex", minWidth:'calc(18vw + 6rem)', maxWidth:'calc(18vw + 6rem)'}}>
                   <input
                     type="file"
                     id={`file-upload-${index}`}
@@ -290,7 +340,7 @@ function CalificarSprintU() {
                     onChange={(event) => handleFileChange(event, index)}
                   />
                   {archivos[index] ? (
-                    <FileItem sx={{margin:'0', padding:'0', width:'auto', maxWidth:'20rem', justifyContent:"start"}}>   
+                    <FileItem sx={{margin:'0', padding:'0', width:'auto', maxWidth:'calc(18vw + 6rem)', justifyContent:"start"}}>   
                       {selectFileIcon(archivos[index].name)}
                       <FileInfo>
                         <Typography variant="body2" noWrap>
