@@ -235,17 +235,11 @@ function CalificarSprintU() {
       try {
         const url = file.webkitRelativePath || ''; // Asegúrate de que la URL esté presente
           if (url) {
-              // Crea un enlace de anclaje (<a>)
               const a = document.createElement('a');
-              
-              // Asigna la URL al atributo 'href' del enlace
               a.href = url;
-              
-              // Establece el atributo 'download' si deseas que el archivo se descargue
               a.download = file.name || 'archivo';
-
-              // Simula el clic en el enlace
               a.click();
+              URL.revokeObjectURL(url);
           }
          else {
           console.error("No se pudo obtener la URL del archivo del servidor.");
@@ -357,9 +351,15 @@ function CalificarSprintU() {
                   />
                   {archivos[index] ? (
                     <FileItem sx={{margin:'0', padding:'0', width:'auto', maxWidth:'calc(18vw + 6rem)', justifyContent:"start"}}>   
-                      {selectFileIcon(archivos[index].name)}
+                      <IconButton onClick={() => handleDownloadFile(archivos[index])}>
+                        {selectFileIcon(archivos[index].name)}
+                      </IconButton>
                       <FileInfo>
-                        <Typography variant="body2" noWrap>
+                        <Typography variant="body2" 
+                          noWrap
+                          color="blue"
+                          onClick={() => handleDownloadFile(archivos[index])}
+                        >
                           {archivos[index].name}
                         </Typography>
                         <Typography variant="caption" color="textSecondary">
@@ -367,11 +367,6 @@ function CalificarSprintU() {
                         </Typography>
                       </FileInfo>
                       <FileActions>
-                        <IconButton 
-                          onClick={() => handleDownloadFile(archivos[index])}
-                        >
-                          <GetAppIcon />
-                        </IconButton>
                         <IconButton 
                           onClick={() => handleRemoveFile(index)}
                         >
