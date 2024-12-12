@@ -128,8 +128,26 @@ function CalificarSprintU() {
   }, []);
 
   const handleFileChange = async (event, index) => {
-    const newArchivos = [...archivos];
     const uploadedFile = event.target.files[0];
+    if (uploadedFile.name.length > 30 ) {
+      setSnackbar({
+        open: true,
+        message: 'El nombre del archivo no puede superar los 30 caracteres.',
+        severity: "info",
+        autoHide: 6000,
+      });
+      return;
+    }
+    if (uploadedFile.size > 100 * 1024 * 1024) {
+      setSnackbar({
+        open: true,
+        message: 'El archivo no puede superar los 100 MB.',
+        severity: "info",
+        autoHide: 6000,
+      });
+      return;
+    }
+    const newArchivos = [...archivos];
     newArchivos[index] = uploadedFile
     console.log(newArchivos)
     setArchivos(newArchivos);
