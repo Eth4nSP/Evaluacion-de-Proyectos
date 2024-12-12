@@ -13,9 +13,11 @@ use App\Models\Semana;
 use App\Models\Tarea;
 use App\Models\Empresa;
 use App\Models\NotaSprint;
+use App\Models\Entregables;
 use App\Http\Controllers\Controller;
 use App\Models\NotaTareasEstudiante;
 use App\Models\ComentarioTarea;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Docente\GrupoController as Grupo;
 
 class SprintController extends Controller
@@ -74,6 +76,43 @@ class SprintController extends Controller
             return response()->json(['error' => 'Error al obtener los sprints y entregables: ' . $e->getMessage()], 500);
         }
     }   
+    public function actualizarEntregable(Request $request): JsonResponse
+{
+    try {
+        // Recibir el array de entregables
+        $entregables = $request->input('entregables'); // Suponemos que el array de entregables viene con las claves correctas
+
+        // Validar si el array está vacío
+        if (empty($entregables)) {
+            return response()->json(['error' => 'No se proporcionaron entregables para actualizar.'], 400);
+        }
+
+        // Iterar sobre cada entregable y actualizar
+        foreach ($entregables as $data) {
+            $idEntregable = $data['idEntregables'];
+            $archivoEntregable = $data['archivoEntregable'];
+            $nombreArchivo = $data['nombreArchivo'];
+
+            // Buscar el entregable por id
+            $entregable = Entregables::findOrFail($idEntregable);
+
+            // Validar y asignar valores
+            $entregable->archivoEntregable = empty($archivoEntregable) ? null : $archivoEntregable;
+            $entregable->nombreArchivo = empty($nombreArchivo) ? null : $nombreArchivo;
+
+            // Guardar los cambios
+            $entregable->save();
+        }
+
+        // Responder con mensaje de éxito
+        return response()->json(['message' => 'Entregables actualizados correctamente'], 200);
+
+    } catch (\Exception $e) {
+        // Manejo de excepciones
+        return response()->json(['error' => 'Error al actualizar los entregables: ' . $e->getMessage()], 500);
+    }
+}
+
     public function empresasSinSprintCalificado(): JsonResponse
     {
         $empresas = DB::table('empresa as e')

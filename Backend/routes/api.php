@@ -266,6 +266,8 @@ Route::get('/empresasSinSemanaCalificada', [SprintController::class, 'empresasSi
 Route::get('/empresa/sprintConEntregables/{idSprint}', [SprintController::class, 'sprintConEntregables']);//utilizado
 
 Route::post('/grupo/actualizar', [GrupoController::class, 'actualizarGrupo']);//utilizado
+Route::post('/empresa/sprintConEntregables/sprint/actualizar', [SprintController::class, 'actualizarEntregable']);//utilizado
+
 
 
 //========================================== Cuentas  =======================================

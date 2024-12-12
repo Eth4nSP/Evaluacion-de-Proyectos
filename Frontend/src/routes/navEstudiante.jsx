@@ -24,6 +24,8 @@ import ListaSprintsVerSeguimiento from '../pages/Docente/HU77_calificarEstudiant
 import VerSeguimientoSemanal from '../pages/Docente/HU77_calificarEstudiante/calificarEstSemana.jsx'
 import RealizarEvaluacion from '../pages/Estudiante/realizarEvaluacion/realizarEvaluacion.jsx';
 
+
+import ModificarArchivosEntregables from "../pages/Estudiante/HU81_modificarArchivosEntregables/modificarArchivosEntregables.jsx";
 function NavEstudiante() {
     return (
       <Routes>
@@ -37,6 +39,7 @@ function NavEstudiante() {
           path="/homeEstu/modificarListaTareas"
           element={<ModificarListaTareas />}
         />
+        <Route path="/homeEstu/modificarArchivosEntregables" element={<ModificarArchivosEntregables />} />
         <Route
           path="/homeEstu/listaTareas"
           element={<ListaTareas />}

@@ -22,7 +22,7 @@ function CardResumen() {
         }
         </>}
         buttons={<> 
-        {!paso && inicio?<Button variant="contained" color="primary" fullWidth >
+        {!paso && inicio?<Button variant="contained" color="primary" fullWidth onClick={() => navigate(`/homeEstu/modificarArchivosEntregables`)}>
           SUBIR ENTREGABLES SPRINTS
         </Button>:<></>}
         <Button variant="outlined" color="primary" fullWidth 

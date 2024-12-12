@@ -18,7 +18,8 @@ class Entregables extends Model
         'descripcionEntregable',
         'archivoEntregable',
         'nombreArchivo',
-        'aceptado'
+        'aceptado',
+        'fechaEntrega',
     ];
 
     /**

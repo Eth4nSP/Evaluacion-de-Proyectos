@@ -35,14 +35,15 @@ use function PHPUnit\Framework\isTrue;
 
 ];*/
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],  // Asegúrate de permitir las rutas de la API y el CSRF cookie
+    'paths' => ['api/*', 'sanctum/csrf-cookie', 'storage/*'],  // Asegúrate de permitir las rutas de la API y el CSRF cookie
 
     'allowed_methods' => ['*'],  // Permitir todos los métodos HTTP
 
     'allowed_origins' => ['http://localhost:5173'],  // Permite el origen de tu frontend en Vue.js
 
     'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization', 'Accept', 'Origin', 'X-CSRF-TOKEN'],
-
+    'exposed_headers' => [], // Necesario para descargas
+    'max_age' => 0,
     //'allow_credentials' => true,
     'supports_credentials' => true,  // Permite que las cookies se envíen
 ];

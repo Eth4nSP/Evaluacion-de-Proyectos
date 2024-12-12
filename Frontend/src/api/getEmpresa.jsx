@@ -99,6 +99,30 @@ export const getSprintConEntregables = async (idSprint) => {
   }
 };
 
+export const actualizarEntregable = async (data) => {
+  try {
+    const response = await fetch(
+      `${apiHost}/empresa/sprintConEntregables/sprint/actualizar`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Error al actualizar el entregable');
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Error en la solicitud:', error);
+    throw error;
+  }
+};
+
 export const getSemanasTareas = async (idEmpresa) => {
   try {
     const response = await fetch(

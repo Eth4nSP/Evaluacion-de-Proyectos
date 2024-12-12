@@ -14,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Storage;
 
+
 class EmpresaController extends Controller
 {
     public function getEmpresaData($id)
