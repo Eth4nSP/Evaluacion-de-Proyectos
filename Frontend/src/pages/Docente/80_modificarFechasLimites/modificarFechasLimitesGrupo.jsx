@@ -73,6 +73,7 @@ const FormularioFechas = () => {
                         <div>
                             Existen planificaciones aceptadas. Los campos de fecha:
                             <ul>
+                                <li>--Fecha limite de entrega de empresas</li>
                                 <li>--Fecha límite de entrega de planificación</li>
                                 <li>--Fecha final de planificación</li>
                                 <li>--Fecha fin de gestión</li>
@@ -91,11 +92,15 @@ const FormularioFechas = () => {
                         <div>
                             No existen planificaciones aceptadas. Los campos de fecha:
                             <ul>
+                                <li>--Fecha limite de entrega de empresas</li>
                                 <li>--Fecha límite de entrega de planificación</li>
                                 <li>--Fecha final de planificación</li>
                                 <li>--Fecha fin de gestión</li>
+
                             </ul>
-                            están habilitados, recuerde que al aceptar una planificación, se deshabilitarán.
+                            están habilitados.
+                            <br />
+                            **recuerde que al aceptar una planificación, se deshabilitarán.**
                         </div>
                     ),
                     severity: 'info',
@@ -114,7 +119,23 @@ const FormularioFechas = () => {
 
     const esquemaValidacion = Yup.object().shape({
         fechaIniGestion: Yup.date(),
-        fechaLimiteEntregaEmpresa: Yup.date(),
+        fechaLimiteEntregaEmpresa: Yup.date()
+            .required('Requerido')
+            .min(
+                Yup.ref('fechaIniGestion'),
+                'Debe ser mayor o igual a la fecha de inicio de gestión.'
+            )
+            .test(
+                'intervalo-7-dias',
+                'Debe haber al menos 7 días entre la fecha de inicio de gestión y esta fecha.',
+                function (value) {
+                    const fechaIniGestion = this.resolve(Yup.ref('fechaIniGestion'));
+                    return (
+                        value && fechaIniGestion && 
+                        new Date(value).getTime() >= new Date(fechaIniGestion).getTime() + 7 * 24 * 60 * 60 * 1000
+                    );
+                }
+            ),
         fechaLimiteEntregaPlanificacion: Yup.date()
             .required('Requerido')
             .min(
@@ -266,6 +287,9 @@ const FormularioFechas = () => {
                             <Typography  align="center" gutterBottom sx={{color:'blue'}}>
                                 *La hora de todas las fechas es 23:59
                             </Typography>
+                            <Typography  align="center" gutterBottom sx={{color:'blue'}}>
+                                *las fechas son seguidas  obligatoriamente
+                            </Typography>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
@@ -296,10 +320,13 @@ const FormularioFechas = () => {
                                             type="date"
                                             name="fechaLimiteEntregaEmpresa"
                                             value={values.fechaLimiteEntregaEmpresa}
+                                            onChange={handleChange}
                                             onBlur={handleBlur}
                                             InputLabelProps={{ shrink: true }}
-                                            disabled
+                                            error={touched.fechaLimiteEntregaEmpresa && Boolean(errors.fechaLimiteEntregaEmpresa)}
+                                            helperText={touched.fechaLimiteEntregaEmpresa && errors.fechaLimiteEntregaEmpresa}
                                             sx={{flexGrow:'1'}}
+                                            disabled={deshabilitarCampos}
                                         />
                                     </Box>
                                     <Box display={'flex'} marginTop={'1rem'}>

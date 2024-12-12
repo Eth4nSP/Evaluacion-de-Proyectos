@@ -2,11 +2,13 @@ const apiHost = import.meta.env.VITE_HOST;
 import { Fragment, useEffect, useState } from 'react';
 import Header from '../../../components/baseUI/Header/header.jsx';
 import Footer from '../../../components/baseUI/Footer/footer.jsx';
-import { Container, Typography, Grid, Card, CardContent, Button } from '@mui/material';
+import { Container, Typography, Grid, Card, CardContent, Button, styled } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Loading from '../../../components/loading/loading.jsx';
 function ListaGruposDocente() {
   const [gruposEnCurso, setGruposEnCurso] = useState([]);
   const [gruposPasados, setGruposPasados] = useState([]);
+  const [loading, setLoading] = useState(true);
     const navigate = useNavigate()
   useEffect(() => {
     const fetchGrupos = async () => {
@@ -34,7 +36,7 @@ function ListaGruposDocente() {
 
         setGruposEnCurso(enCurso);
         setGruposPasados(pasados);
-        console.log(window.location.pathname)
+        setLoading(false)
       } catch (error) {
         console.error('Error al obtener los grupos:', error);
       }
@@ -47,7 +49,15 @@ function ListaGruposDocente() {
     localStorage.setItem('idGrupo', idGrupo)
     navigate("/homeDocente")
   };
-
+  if(loading)return(
+    <Fragment>
+      <Header />
+      <Container maxWidth="lg" sx={{ paddingTop: 4, marginTop:'5rem', minHeight:'72.9vh' }}>
+        <Loading/>
+      </Container>
+      <Footer />
+    </Fragment>
+  )
   return (
     <Fragment>
       <Header />
@@ -63,7 +73,7 @@ function ListaGruposDocente() {
           {gruposEnCurso.length > 0 ? (
             gruposEnCurso.map((grupo) => (
               <Grid item xs={12} sm={6} md={4} key={grupo.id}>
-                <Card variant="outlined" sx={{ height: '100%' }}>
+                <CardHere variant="outlined">
                   <CardContent>
                     <Typography variant="h6">{grupo.gestionGrupo} / Grupo: {grupo.numGrupo}</Typography>
                     <Typography variant="body2">
@@ -81,7 +91,7 @@ function ListaGruposDocente() {
                       Seleccionar
                     </Button>
                   </CardContent>
-                </Card>
+                </CardHere>
               </Grid>
             ))
           ) : (
@@ -96,7 +106,7 @@ function ListaGruposDocente() {
           {gruposPasados.length > 0 ? (
             gruposPasados.map((grupo) => (
               <Grid item xs={12} sm={6} md={4} key={grupo.id}>
-                <Card variant="outlined" sx={{ height: '100%' }}>
+                <CardHere variant="outlined">
                   <CardContent>
                     <Typography variant="h6">{grupo.gestionGrupo}</Typography>
                     <Typography variant="body2">
@@ -114,7 +124,7 @@ function ListaGruposDocente() {
                       Seleccionar
                     </Button>
                   </CardContent>
-                </Card>
+                </CardHere>
               </Grid>
             ))
           ) : (
@@ -128,3 +138,14 @@ function ListaGruposDocente() {
 }
 
 export default ListaGruposDocente;
+
+const CardHere = styled(Card)({
+  height: '100%',
+  borderRadius: "8px",
+  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+  ":hover":{
+    boxShadow: "0 1rem 10rem rgba(0,0,0,0.2)",
+    zIndex:'1000',
+    backgroundColor:'#dcdadaf'
+  }
+});

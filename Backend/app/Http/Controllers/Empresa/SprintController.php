@@ -82,6 +82,7 @@ class SprintController extends Controller
             ->join('estudiantesgrupos as eg', 'eg.idEstudiante', '=', 'est.idEstudiante')
             ->join('grupo as g', 'g.idGrupo', '=', 'eg.idGrupo')
             ->where('g.idDocente', '=', session('docente.id'))
+            ->where('g.idGrupo',session('docente.gestionGrupo'))
             ->select('e.idEmpresa',
         'e.nombreEmpresa',
         'e.nombreLargo')
@@ -141,6 +142,7 @@ class SprintController extends Controller
             ->join('estudiantesgrupos as eg', 'eg.idEstudiante', '=', 'est.idEstudiante')
             ->join('grupo as g', 'g.idGrupo', '=', 'eg.idGrupo')
             ->where('g.idDocente', '=', session('docente.id'))
+            ->where('g.idGrupo',session('docente.gestionGrupo'))
             ->select('e.idEmpresa',
         'e.nombreEmpresa',
         'e.nombreLargo')

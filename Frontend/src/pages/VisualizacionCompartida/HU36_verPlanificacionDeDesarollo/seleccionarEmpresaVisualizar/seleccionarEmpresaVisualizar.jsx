@@ -6,7 +6,7 @@ function SeleccionarEmpresaVisualizar() {
       titulo={"SELECCIONE UNA PLANIFICACION PARA VISUALIZAR"}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack={"/"}
+      dirBack={"/homeDocente"}
       loading={false}
       error={{error:false}}
     >

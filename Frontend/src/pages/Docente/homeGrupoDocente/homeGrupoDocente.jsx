@@ -41,7 +41,7 @@ function Home() {
   return (
     <>
       <Header />
-      <Button variant="contained" color="primary" onClick={()=>navigate("/")} sx={{ marginTop:'5rem', marginLeft:'5rem'}}>
+      <Button variant="contained" color="primary" onClick={()=>navigate("/")} sx={{ marginTop:'5rem', marginLeft:'calc(5vw + 0.5rem)' }}>
         Volver a la lista de grupos
       </Button>
       <Title variant="h5" align="center">

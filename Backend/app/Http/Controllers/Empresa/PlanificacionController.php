@@ -39,6 +39,7 @@ class PlanificacionController extends Controller
             )
             ->where('g.idDocente', '=', $idDocente)
             ->where('p.aceptada', '=', 1) // Filtrar solo planificaciones aceptadas
+            ->where('g.idGrupo',session('docente.gestionGrupo'))
             ->orderBy('p.fechaEntrega', 'desc') // Ordenar por fecha de entrega más reciente
             ->groupBy('e.idEmpresa', 'e.nombreEmpresa', 'e.nombreLargo', 'p.idPlanificacion', 'p.aceptada')
             ->get();
@@ -78,6 +79,7 @@ class PlanificacionController extends Controller
                 'p.publicada',
                 DB::raw('(SELECT COUNT(*) FROM sprint WHERE sprint.idPlanificacion = p.idPlanificacion) as numeroSprints')
             )
+            ->where('g.idGrupo',session('docente.gestionGrupo'))
             ->where('g.idDocente', '=', $docenteId)
             ->where(function ($query) {
                 $query->whereNull('p.aceptada')
@@ -165,6 +167,7 @@ class PlanificacionController extends Controller
                 DB::raw('(SELECT COUNT(*) FROM sprint WHERE sprint.idPlanificacion = p.idPlanificacion) as numeroSprints')
             )
             ->where('g.idDocente', '=', $docenteId)
+            ->where('g.idGrupo',session('docente.gestionGrupo'))
             ->where(function ($query) {
             $query->where('p.publicada', '=', 0)
                   ->where('p.aceptada', '!=', 1)
@@ -244,6 +247,7 @@ class PlanificacionController extends Controller
             ->where('g.idDocente', '=', $docenteId)
             ->where('p.publicada', '=', 0)
             ->where('p.aceptada', '!=', 1)
+            ->where('g.idGrupo',session('docente.gestionGrupo'))
             ->whereNotNull('p.idPlanificacion') // Filtramos solo las empresas con planificación
             ->get();
     

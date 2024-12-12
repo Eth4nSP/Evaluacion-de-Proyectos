@@ -45,7 +45,7 @@ function EmpresasParaTareas() {
       datosTabla={data}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack="/"
+      dirBack="/homeDocente"
       dirForward= {`/homeDocente/listaEmpresasVerTareas/sprints`}
       mensajeSearch="Buscar Empresa"
       nombreContador="Empresas"
