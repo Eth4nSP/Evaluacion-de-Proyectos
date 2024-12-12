@@ -19,7 +19,8 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import ImageIcon from "@mui/icons-material/Image";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
-
+import GetAppIcon from "@mui/icons-material/GetApp";
+import ClearIcon from "@mui/icons-material/Clear";
 const UploadContainer = styled(Box)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
@@ -34,7 +35,11 @@ const UploadContainer = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.action.hover,
   },
 }));
-
+const FileActions = styled(Box)(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-end",
+}));
 const FileItem = styled(Box)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
@@ -103,29 +108,28 @@ function CalificarSprintU() {
     fetchSprints();
   }, []);
 
-  const handleFileChange = (event, index) => {
+  const handleFileChange = async(event, index) => {
     const newArchivos = [...archivos];
     newArchivos[index] = event.target.files[0];
     setArchivos(newArchivos);
+    const entregables = await Promise.all(datosSprint.entregables.map(async(entregable, i) => {
+      if (i !== index) return entregable;
+      const newArchivo = await convertFileToBase64(event.target.files[0]);
+      return {
+        ...entregable,
+        nombreArchivo: event.target.files[0].name,
+        archivo: newArchivo
+      };
+    }));
+    setDatosSprint({
+      ...datosSprint,
+      entregables,
+    });
   };
 
   const handleSave = async () => {
     try {
-      const entregablesPayload = datosSprint.entregables.map((entregable, index) => {
-        const archivo = archivos[index];
-        if (archivo) {
-          return {
-            idEntregable: entregable.idEntregable,
-            nombreEntregable: entregable.descripcionEntregable,
-            nombreArchivo: archivo.name,
-            archivo: URL.createObjectURL(archivo),
-          };
-        }
-        return null;
-      }).filter(entregable => entregable !== null);
-
-      console.log("Payload to submit:", entregablesPayload);
-
+      console.log("Payload to submit:", datosSprint.entregables);
       setSnackbar({
         open: true,
         message: "Entregables enviados correctamente.",
@@ -141,6 +145,15 @@ function CalificarSprintU() {
         autoHide: 6000,
       });
     }
+  };
+
+  const convertFileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
   };
 
   const handleCancel = () => {
@@ -180,6 +193,34 @@ function CalificarSprintU() {
       default:
         return <InsertDriveFileIcon />;
     }
+  };
+
+
+  const handleDownloadFile = (file) => {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+  
+  const handleRemoveFile = async(index) => {
+    const newArchivos = [...archivos];
+    newArchivos[index] = null;
+    setArchivos(newArchivos);
+    const entregables = datosSprint.entregables.map((entregable, i) => {
+      if (i !== index) return entregable;
+      return {
+        ...entregable,
+        nombreArchivo: null,
+        archivo: null
+      };
+    });
+    setDatosSprint({
+      ...datosSprint,
+      entregables,
+    });
   };
 
   if (loading)
@@ -259,6 +300,18 @@ function CalificarSprintU() {
                           {(archivos[index].size / 1024 / 1024).toFixed(2)} MB
                         </Typography>
                       </FileInfo>
+                      <FileActions>
+                        <IconButton 
+                          onClick={() => handleDownloadFile(archivos[index])}
+                        >
+                          <GetAppIcon />
+                        </IconButton>
+                        <IconButton 
+                          onClick={() => handleRemoveFile(index)}
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </FileActions>
                     </FileItem>
                   ) : (
                     <label htmlFor={`file-upload-${index}`}>
