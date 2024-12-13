@@ -86,7 +86,7 @@ const CrearFechasGestion = () => {
             titulo="CREAR FECHAS DE GESTIÓN"
             ocultarAtras={false}
             confirmarAtras={false}
-            dirBack="/homeDocente"
+            dirBack="/"
             loading={loading}
             error={{ error: false }}
         >
