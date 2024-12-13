@@ -11,7 +11,7 @@ class GestionController extends Controller{
         $result = DB::table('grupo as g')
         ->join('estudiantesgrupos as eg', 'g.idGrupo','=','eg.idGrupo')
         ->join('estudiante as e','eg.idEstudiante','=','e.idEstudiante')
-        ->select('g.idGrupo as id','g.gestionGrupo')
+        ->select('g.idGrupo as id','g.gestionGrupo', 'g.fechaIniGestion', 'g.fechaFinGestion', 'g.numGrupo')
         ->where('e.idEstudiante',$idEstudiante)
         ->get();
         

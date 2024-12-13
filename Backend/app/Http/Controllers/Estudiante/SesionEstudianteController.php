@@ -20,7 +20,8 @@ class SesionEstudianteController extends Controller
 {  
 
     
-    function getDataEstudiante() {
+    function getDataEstudiante(Request $request) {
+        $request ->idGrupo;
         // Fecha actual
         $now = Carbon::now();
         $idEstudiante = session('estudiante.id');

@@ -44,11 +44,12 @@ function Header() {
   };
   const random = Cookies.get('random');
   const role = decrypt(random);
+  console.log(window.location.pathname);
   return (
     <Box >
       <AppBar position="fixed">
         <Toolbar>
-          { '/'!== window.location.pathname ? (
+          { '/'!== window.location.pathname && '/GruposDocente'!== window.location.pathname  ? (
             <IconButton
               size="large"
               edge="start"

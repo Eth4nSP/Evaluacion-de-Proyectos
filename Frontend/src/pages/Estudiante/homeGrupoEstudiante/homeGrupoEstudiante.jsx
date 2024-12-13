@@ -16,9 +16,10 @@ import Loading from '../../../components/loading/loading.jsx'
 function HomeEstudiante() {
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate =useNavigate()
+  const idGrupo = localStorage.getItem("idGrupo")
   useEffect(()=>{
     const getOrigin = async() =>{
-      const link = `${apiHost}/estudiante/getDataEstudiante`
+      const link = `${apiHost}/estudiante/getDataEstudiante`+new URLSearchParams({idGrupo})
       const body = {
         method: "GET",
         headers: {"Content-Type": "application/json"},

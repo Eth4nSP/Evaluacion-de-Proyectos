@@ -24,14 +24,14 @@ import ListaSprintsVerSeguimiento from '../pages/Docente/HU77_calificarEstudiant
 import VerSeguimientoSemanal from '../pages/Docente/HU77_calificarEstudiante/calificarEstSemana.jsx'
 import RealizarEvaluacion from '../pages/Estudiante/realizarEvaluacion/realizarEvaluacion.jsx';
 
-
+import ListaGruposEstudiante from '../pages/Estudiante/homeGrupoEstudiante/listaDeGruposEstudiante.jsx';
 import ModificarArchivosEntregables from "../pages/Estudiante/HU81_modificarArchivosEntregables/modificarArchivosEntregables.jsx";
 function NavEstudiante() {
     return (
       <Routes>
         <Route
           path="/"
-          element={<RedirigirHome/>}
+          element={<ListaGruposEstudiante/>}
         />
         <Route path="/homeEstu" element={<HomeGrupoEstudiante />} />
         {/** ROUTES JHON NUEVO FORMATO*/}
