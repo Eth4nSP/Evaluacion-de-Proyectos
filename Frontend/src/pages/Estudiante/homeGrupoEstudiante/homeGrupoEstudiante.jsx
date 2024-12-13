@@ -3,7 +3,7 @@ const apiHost = import.meta.env.VITE_HOST;
 import Footer from "../../../components/baseUI/Footer/footer.jsx";
 import Header from "../../../components/baseUI/Header/header.jsx";
 import { styled } from "@mui/material/styles";
-import { Box, Typography} from "@mui/material";
+import { Box, Typography, Button} from "@mui/material";
 import { Fragment, useEffect, useState} from "react";
 import CardProgreso from '../../../components/cardsHome/cardEstudiante/cardProgreso.jsx'
 import CardPlanificacion from '../../../components/cardsHome/cardEstudiante/cardPlanificacion.jsx'
@@ -16,9 +16,10 @@ import Loading from '../../../components/loading/loading.jsx'
 function HomeEstudiante() {
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate =useNavigate()
+  const idGrupo = localStorage.getItem("idGrupo")
   useEffect(()=>{
     const getOrigin = async() =>{
-      const link = `${apiHost}/estudiante/getDataEstudiante`
+      const link = `${apiHost}/estudiante/getDataEstudiante/${idGrupo}`; 
       const body = {
         method: "GET",
         headers: {"Content-Type": "application/json"},
@@ -89,7 +90,10 @@ function HomeEstudiante() {
   return (
     <Fragment>
       <Header />
-      <Title variant="h5" sx={{marginTop:'5rem', textAlign:'center'}}>Bienvenid@, {nombreCompleto}</Title>
+      <Button variant="contained" color="primary" onClick={()=>navigate("/")} sx={{ marginTop:'5rem', marginLeft:'calc(5vw + 0.5rem)' }}>
+        Volver a la lista de grupos
+      </Button>
+      <Title variant="h5" sx={{ textAlign:'center'}}>Bienvenid@, {nombreCompleto}</Title>
       <Title variant="h6" sx={{textAlign:'center'}}>{localStorage.getItem('gestion')}</Title>
       <Container>
         {(aceptada!==0)?<CardProgreso></CardProgreso>:<></>} 

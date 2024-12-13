@@ -206,7 +206,7 @@ Route::get('/docente/getGrupo/{idGrupo}', [SesionDocenteController::class, 'getG
 
 Route::get('/session/active/estudiante', [AuthController::class, 'isSessionActiveEstudiante']);
 Route::get('/estudiante/getEmpresa', [SesionEstudianteController::class, 'getEmpresaSesion']);
-Route::get('/estudiante/getDataEstudiante', [SesionEstudianteController::class, 'getDataEstudiante']);
+Route::get('/estudiante/getDataEstudiante/{idGrupo}', [SesionEstudianteController::class, 'getDataEstudiante']);
 Route::get('/estudiante/getGrupo', [SesionEstudianteController::class, 'getGrupoSesion']);
 
 // ============================         SESIONES COMPARTIDAS    ==================================
