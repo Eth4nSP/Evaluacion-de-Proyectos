@@ -165,7 +165,7 @@ const ConfigurarEvaluacion = () => {
       titulo={"CONFIGURAR EVALUACION"}
       ocultarAtras={false}
       confirmarAtras={true}
-      dirBack={"/"}
+      dirBack={"/homeDocente"}
       loading={loading}
       error={error}
     >

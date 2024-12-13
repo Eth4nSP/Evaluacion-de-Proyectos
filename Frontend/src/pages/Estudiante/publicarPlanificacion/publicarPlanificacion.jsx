@@ -89,7 +89,7 @@ function PublicarPlanificacion() {
         titulo={"PUBLICAR PLANIFICACION"}
         ocultarAtras={false}
         confirmarAtras={true}
-        dirBack={"/"}
+        dirBack={"/homeEstu"}
         loading={loading}
         error={error}
       >

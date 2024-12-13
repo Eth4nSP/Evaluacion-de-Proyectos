@@ -33,29 +33,26 @@ function EmpresasPorGrupo() {
     errorMessage: "",
     errorDetails: "",
   });
-
-  // Initial data fetch with GET request
+  
+  const userRole = Cookies.get('random');
+  const decryptedRole = decrypt(userRole);
+  const idGrupo = localStorage.getItem("idGrupo")
   useEffect(() => {
     setLoading(true)
     const fetchEmpresasDatos = async () => {
       setLoading(true);
       try {
-        const userRole = Cookies.get('random');
-        const decryptedRole = decrypt(userRole);
         let url = '';
         if(decryptedRole === 'docente'){
             url = '/docente/obtenerEmpresasPorGrupoYDocente?'
           }
         else{ 
-            url = '/estudiante/obtenerEmpresasPorGrupoYDocenteEstudiante?'
+            url = '/estudiante/obtenerEmpresasPorGrupoYDocenteEstudiante/' + idGrupo;
           }
-        console.log(url);
         const result = await fetchEmpresas(url);
         if(result.ok){
-          console.log(result);
-          setData(result);
-          console.log('la data');
-          console.log(data);
+          const data = await result.json();
+          setData(data);
         }else {
           const errorMessage = result.error;
           console.log(errorMessage);
@@ -80,7 +77,7 @@ function EmpresasPorGrupo() {
       datosTabla={data}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack="/homeDocente"
+      dirBack={decryptedRole === 'docente'?"/homeDocente":"/homeEstu"}
       dirForward=""
       mensajeSearch = "Buscar Empresa"
       nombreContador = "Empresas"

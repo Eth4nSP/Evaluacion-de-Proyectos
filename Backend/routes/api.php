@@ -50,7 +50,7 @@ Route::get('/tarea/{idTarea}/{idEmpresa}', [TareaController::class, 'obtenerTare
 Route::get('/estudiante/gruposDocente', [GrupoController::class, 'obtenerTodosLosGrupos']);
 Route::get('/estudiante/descripcionGrupo/{idGrupo}', [GrupoController::class, 'getDescripcion']);
 Route::get('/estudiante/sprint/semana/{idSprint}',[SprintController::class, 'sprintsSemanas']);
-Route::get('/estudiante/obtenerEmpresasPorGrupoYDocenteEstudiante',[GrupoController::class, 'obtenerEmpresasPorGrupoYDocenteEstudiante']);
+Route::get('/estudiante/obtenerEmpresasPorGrupoYDocenteEstudiante/{idGrupo}',[GrupoController::class, 'obtenerEmpresasPorGrupoYDocenteEstudiante']);
 
 //============================= GET DOCENTE ================================
 //---Recibe la lista de estudiantes de un grupo especifico del docente activo
@@ -206,7 +206,7 @@ Route::get('/docente/getGrupo/{idGrupo}', [SesionDocenteController::class, 'getG
 
 Route::get('/session/active/estudiante', [AuthController::class, 'isSessionActiveEstudiante']);
 Route::get('/estudiante/getEmpresa', [SesionEstudianteController::class, 'getEmpresaSesion']);
-Route::get('/estudiante/getDataEstudiante', [SesionEstudianteController::class, 'getDataEstudiante']);
+Route::get('/estudiante/getDataEstudiante/{idGrupo}', [SesionEstudianteController::class, 'getDataEstudiante']);
 Route::get('/estudiante/getGrupo', [SesionEstudianteController::class, 'getGrupoSesion']);
 
 // ============================         SESIONES COMPARTIDAS    ==================================

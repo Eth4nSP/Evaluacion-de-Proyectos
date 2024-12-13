@@ -1,5 +1,6 @@
 <?php
 namespace App\Http\Controllers\Estudiante;
+
 use App\Http\Controllers\Controller;
 use App\Models\Estudiante;
 use App\Models\Docente;
@@ -17,48 +18,54 @@ use Illuminate\Support\Facades\Response;
 use Carbon\Carbon;
 
 class SesionEstudianteController extends Controller
-{  
-
-    
-    function getDataEstudiante() {
-        // Fecha actual
+{
+    function getDataEstudiante(Request $request)
+    {
+        $idGrupo = $request->idGrupo;
         $now = Carbon::now();
         $idEstudiante = session('estudiante.id');
-    
-        // Obtener el estudiante y su nombre completo
+
         $estudiante = Estudiante::find($idEstudiante);
+        if (!$estudiante) {
+            return response()->json(['error' => 'Estudiante no encontrado'], 404);
+        }
+
         $nombreCompleto = trim("{$estudiante->nombreEstudiante} {$estudiante->primerApellido} {$estudiante->segundoApellido}");
-    
-        // Obtener la empresa asociada al estudiante
-        $empresa = $estudiante->empresas()->first();  // Usamos la relación de Estudiante con Empresas
+
+        $grupo = Grupo::find($idGrupo);
+        if (!$grupo) {
+            return response()->json(['error' => 'Grupo no encontrado'], 404);
+        }
+
+        $empresa = $grupo->empresas()->whereHas('estudiantes', function ($query) use ($idEstudiante) {
+            $query->where('estudiantesempresas.idEstudiante', $idEstudiante); // Especifica la tabla para evitar ambigüedad
+        })->first();
+        
+
         $idEmpresa = $empresa ? $empresa->idEmpresa : -1;
         $empresaPublicada = $empresa ? $empresa->publicada : 0;
-    
-        // Obtener el grupo asociado al estudiante
-        $grupo = $estudiante->grupos()->first();  // Usamos la relación de Estudiante con Grupos
-        $idGrupo = $grupo ? $grupo->idGrupo : -1;
-        $fechaIniGestion = $grupo ? $grupo->fechaIniGestion : '1';
-        $fechaLimiteEntregaEmpresa = $grupo ? $grupo->fechaLimiteEntregaEmpresa : '1';
-        $fechaLimiteEntregaPlanificacion = $grupo ? $grupo->fechaLimiteEntregaPlanificacion : '1';
-        $fechaFinPlanificacion = $grupo ? $grupo->fechaFinPlanificacion : '1';
-        $fechaFinGestion = $grupo ? $grupo->fechaFinGestion : '1';
-        $gestion = $grupo? trim("Gestion: {$grupo->gestionGrupo}, Grupo:{$grupo->numGrupo}"): 'No Tiene grupo';
+
+        $fechaIniGestion = $grupo->fechaIniGestion ?? '1';
+        $fechaLimiteEntregaEmpresa = $grupo->fechaLimiteEntregaEmpresa ?? '1';
+        $fechaLimiteEntregaPlanificacion = $grupo->fechaLimiteEntregaPlanificacion ?? '1';
+        $fechaFinPlanificacion = $grupo->fechaFinPlanificacion ?? '1';
+        $fechaFinGestion = $grupo->fechaFinGestion ?? '1';
+        $gestion = trim("Gestion: {$grupo->gestionGrupo}, Grupo:{$grupo->numGrupo}");
 
         $evaluacionGrupo = null;
         if ($idGrupo !== -1) { // Si el grupo existe
             $evaluacionGrupo = EvaluacionesGrupo::where('idGrupo', $idGrupo)->first();
         }
-
         $planificacion = Planificacion::where('idEmpresa', $idEmpresa)->first();
         $idPlanificacion = $planificacion ? $planificacion->idPlanificacion : -1;
-        $aceptada = $planificacion ? (($planificacion->aceptada)!==null? $planificacion->aceptada:0) : 0;
-        $publicada = $planificacion ? (($planificacion->publicada)!==null? $planificacion->publicada:0) : 0;
+        $aceptada = $planificacion ? ($planificacion->aceptada !== null ? $planificacion->aceptada : 0) : 0;
+        $publicada = $planificacion ? ($planificacion->publicada !== null ? $planificacion->publicada : 0) : 0;
 
         $idSprint = -1;
         $sprint = Sprint::where('idPlanificacion', $idPlanificacion)
-                        ->whereDate('fechaIni', '<=', $now)
-                        ->whereDate('fechaFin', '>=', $now)
-                        ->first();
+            ->whereDate('fechaIni', '<=', $now)
+            ->whereDate('fechaFin', '>=', $now)
+            ->first();
         $fechaLimiteSprint = '';
         $fechaIniSprint = '';
         if ($sprint) {
@@ -66,14 +73,12 @@ class SesionEstudianteController extends Controller
             $fechaLimiteSprint = $sprint->fechaFin;
             $fechaIniSprint = $sprint->fechaIni;
         }
-    
-        // Validar semana
+
         $idSemana = -1;
         $semana = Semana::where('idPlanificacion', $idPlanificacion)
-                        ->whereDate('fechaIni', '<=', $now)
-                        ->whereDate('fechaFin', '>=', $now)
-                        ->where('idPlanificacion', $idPlanificacion)
-                        ->first();
+            ->whereDate('fechaIni', '<=', $now)
+            ->whereDate('fechaFin', '>=', $now)
+            ->first();
         $fechaLimiteSemana = '';
         $fechaIniSemana = '';
         if ($semana) {
@@ -81,18 +86,18 @@ class SesionEstudianteController extends Controller
             $fechaLimiteSemana = $semana->fechaFin;
             $fechaIniSemana = $semana->fechaIni;
         }
-    
+
         return response()->json([
             "idEstudiante" => $idEstudiante,
             'nombreCompleto' => $nombreCompleto,
             'idEmpresa' => $idEmpresa,
-            'empresaPublicada' =>$empresaPublicada,
+            'empresaPublicada' => $empresaPublicada,
             'idPlanificacion' => $idPlanificacion,
             'aceptada' => $aceptada,
             'publicada' => $publicada,
             'idSprint' => $idSprint,
             'idSemana' => $idSemana,
-            'idGrupo' => $idGrupo,    
+            'idGrupo' => $idGrupo,
             'fechaIniGestion' => $fechaIniGestion,
             'fechaLimiteEntregaEmpresa' => $fechaLimiteEntregaEmpresa,
             'fechaLimiteEntregaPlanificacion' => $fechaLimiteEntregaPlanificacion,
@@ -103,18 +108,18 @@ class SesionEstudianteController extends Controller
             'fechaIniSemana' => $fechaIniSemana,
             'fechaLimiteSprint' => $fechaLimiteSprint,
             'fechaLimiteSemana' => $fechaLimiteSemana,
-            'tipoEvaluacion' => $evaluacionGrupo?$evaluacionGrupo->tipoEvaluacion:'1',
-            'fechaEvaluacion' => $evaluacionGrupo?$evaluacionGrupo->fechaEvaluacion:'1',
+            'tipoEvaluacion' => $evaluacionGrupo ? $evaluacionGrupo->tipoEvaluacion : '1',
+            'fechaEvaluacion' => $evaluacionGrupo ? $evaluacionGrupo->fechaEvaluacion : '1',
         ], 200);
     }
-    
-    
-    public function getGrupoSesion() {
+
+    public function getGrupoSesion()
+    {
         if ($idEstudiante = session('estudiante.id')) {
             $grupo = DB::table('grupo as g')
                 ->join('estudiantesgrupos as eg', 'g.idGrupo', '=', 'eg.idGrupo')
                 ->where('eg.idEstudiante', $idEstudiante)
-                ->select('g.idGrupo') // Seleccionar solo el campo necesario
+                ->select('g.idGrupo')
                 ->first();
             if ($grupo) {
                 return response()->json(['idGrupo' => $grupo->idGrupo], 200);

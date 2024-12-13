@@ -8,7 +8,7 @@ import Loading from '../../../components/loading/loading.jsx';
 
 const apiHost = import.meta.env.VITE_HOST;
 
-function ListaGruposDocente() {
+function ListaGruposEstudiante() {
   const [gruposEnCurso, setGruposEnCurso] = useState([]);
   const [gruposPasados, setGruposPasados] = useState([]);
   const [filteredGrupos, setFilteredGrupos] = useState([]);
@@ -19,7 +19,7 @@ function ListaGruposDocente() {
   useEffect(() => {
     const fetchGrupos = async () => {
       try {
-        const response = await fetch(`${apiHost}/docente/visualizarSemestres`, {
+        const response = await fetch(`${apiHost}/estudiante/visualizarSemestres`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -61,7 +61,7 @@ function ListaGruposDocente() {
 
   const handleClick = (idGrupo) => {
     localStorage.setItem('idGrupo', idGrupo);
-    navigate('/homeDocente');
+    navigate('/homeEstu');
   };
 
   if (loading) {
@@ -136,7 +136,13 @@ function ListaGruposDocente() {
               </Grid>
             ))
           ) : (
-            <Typography variant="body1" marginTop={'1rem'} color='red'>No hay grupos en curso.</Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate('/GruposDocente')}
+            >
+              INSCRIBETE A UN GRUPO
+            </Button>
           )}
         </Grid>
 
@@ -180,7 +186,7 @@ function ListaGruposDocente() {
   );
 }
 
-export default ListaGruposDocente;
+export default ListaGruposEstudiante;
 const CardHere = styled(Card)({
   height: '100%',
   borderRadius: "8px",

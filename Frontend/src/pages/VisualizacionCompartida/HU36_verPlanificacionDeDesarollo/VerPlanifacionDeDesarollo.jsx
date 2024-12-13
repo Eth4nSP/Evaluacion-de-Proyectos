@@ -7,9 +7,11 @@ import TablaPlanificacion from "../../../components/tablaPlanificacionDeDesaroll
 import { getEmpresaData } from "../../../api/getEmpresa.jsx";
 import { getPlanificacion } from "../../../api/getPlanificacion.jsx";
 import BaseUI from "../../../components/baseUI/baseUI.jsx";
-
-
+import cookie from "js-cookie";
+import { decrypt } from "../../../api/decrypt.jsx";
 function PlanificacionDeDesarollo() {
+  const random = cookie.get('random');
+  const role = decrypt(random);
   const [empresaData, setEmpresaData] = useState(null);
   let { idEmpresa } = useParams();
   const [loading, setLoading] = useState(true);
@@ -49,7 +51,7 @@ function PlanificacionDeDesarollo() {
         titulo={"VISUALIZAR PLANIFICACION"}
         ocultarAtras={false}
         confirmarAtras={false}
-        dirBack={"/"}
+        dirBack={role === "docente" ? "/visualizarPlanificacion" : "/homeEstu"}
         loading={loading}
         error={error}
       >

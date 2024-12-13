@@ -145,7 +145,7 @@ const RealizarEvaluacion = () => {
       titulo={"REALIZAR EVALUACION"}
       ocultarAtras={false}
       confirmarAtras={true}
-      dirBack={"/"}
+      dirBack={"/homeEstu "}
       loading={loading}
       error={error}
     >

@@ -62,7 +62,7 @@ function ModificarPlanificacion() {
         titulo={"MODIFICAR PLANIFICACION"}
         ocultarAtras={false}
         confirmarAtras={true}
-        dirBack={"/"}
+        dirBack={"/homeEstu"}
         loading={loading}
         error={error}
       >

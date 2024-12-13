@@ -48,7 +48,7 @@ function Header() {
     <Box >
       <AppBar position="fixed">
         <Toolbar>
-          { '/'!== window.location.pathname ? (
+          { '/'!== window.location.pathname && '/GruposDocente'!== window.location.pathname  ? (
             <IconButton
               size="large"
               edge="start"
