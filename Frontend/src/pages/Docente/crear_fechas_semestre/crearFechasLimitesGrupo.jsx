@@ -1,3 +1,4 @@
+const apiHost = import.meta.env.VITE_HOST;
 import { useState } from 'react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
@@ -86,7 +87,7 @@ const FormularioCrearGrupo = () => {
 
     const manejarSubmit = async (valores) => {
         try {
-            const response = await fetch('http://localhost:8000/api/crearGrupo', {
+            const response = await fetch(`${apiHost}}/crearGrupo`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

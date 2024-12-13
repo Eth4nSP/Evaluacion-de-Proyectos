@@ -150,7 +150,7 @@ export default function ModificarListaTareas() {
     }
     try {
       const response = await fetch(
-        `${apiHost}}/estudiante/crearListaTareas`,
+        `${apiHost}/estudiante/crearListaTareas`,
         {
           method: "POST",
           headers: {
@@ -180,7 +180,7 @@ export default function ModificarListaTareas() {
       console.log(tasksEliminadas)
       try {
         const response = await fetch(
-          `${apiHost}}/estudiante/eliminarTareas`,
+          `${apiHost}/estudiante/eliminarTareas`,
           {
             method: "POST",
             headers: {
