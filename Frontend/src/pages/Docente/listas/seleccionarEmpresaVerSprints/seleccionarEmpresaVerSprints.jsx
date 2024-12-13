@@ -6,7 +6,7 @@ function SeleccionarEmpresaVerSprints() {
       titulo={"SELECCIONE UNA EMPRESA PARA VISUALIZAR SUS SPRINTS"}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack={"/"}
+      dirBack={"/homeDocente"}
       loading={false}
       error={{error:false}}
     >

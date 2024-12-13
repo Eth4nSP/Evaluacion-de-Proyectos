@@ -174,7 +174,7 @@ function ValidarPlanificacion() {
         titulo={"VALIDAR PLANIFICACION"}
         ocultarAtras={false}
         confirmarAtras={true}
-        dirBack={"/"}
+        dirBack={"/validarPlanificacion"}
         loading={loading}
         error={error}
       >

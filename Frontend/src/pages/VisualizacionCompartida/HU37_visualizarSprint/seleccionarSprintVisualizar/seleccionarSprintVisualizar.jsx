@@ -13,7 +13,8 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import BaseUI from "../../../../components/baseUI/baseUI";
 import Loading from "../../../../components/loading/loading";
 import Error from "../../../../components/error/error";
-
+import cookie from "js-cookie";
+import { decrypt } from "../../../../api/decrypt";
 // Estilos personalizados
 const StyledPaper = styled(Paper)({
   backgroundColor: "#d0d4e4", 
@@ -45,6 +46,8 @@ const StyledListItemText = styled(ListItemText)({
 });
 
 function SeleccionarSprintVisualizar() {
+  const random = cookie.get('random');
+  const role = decrypt(random);
   const [listaSprints, setListaSprints] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState({
@@ -83,7 +86,7 @@ function SeleccionarSprintVisualizar() {
       titulo="SELECCIONE UN SPRINT PARA VISUALIZAR"
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack={`/visualizarSprint/`}
+      dirBack={role==='docente'?`/visualizarSprint`:`/homeEstu`}
       loading={false}
       error={{error:false}}
     >
