@@ -212,6 +212,20 @@ const FormularioCrearGrupo = () => {
                                 <Grid item xs={6}>
                                     <TextField
                                         fullWidth
+                                        label="Fecha Final de Gestión"
+                                        type="date"
+                                        name="fechaFinGestion"
+                                        value={values.fechaFinGestion}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        InputLabelProps={{ shrink: true }}
+                                        error={touched.fechaFinGestion && Boolean(errors.fechaFinGestion)}
+                                        helperText={touched.fechaFinGestion && errors.fechaFinGestion}
+                                    />
+                                </Grid>
+                                <Grid item xs={6}>
+                                    <TextField
+                                        fullWidth
                                         label="Fecha Inicial de Entrega de Empresas"
                                         type="date"
                                         value={values.fechaIniGestion}
@@ -282,20 +296,6 @@ const FormularioCrearGrupo = () => {
                                         InputLabelProps={{ shrink: true }}
                                         error={touched.fechaFinPlanificacion && Boolean(errors.fechaFinPlanificacion)}
                                         helperText={touched.fechaFinPlanificacion && errors.fechaFinPlanificacion}
-                                    />
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        label="Fecha Final de Gestión"
-                                        type="date"
-                                        name="fechaFinGestion"
-                                        value={values.fechaFinGestion}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        InputLabelProps={{ shrink: true }}
-                                        error={touched.fechaFinGestion && Boolean(errors.fechaFinGestion)}
-                                        helperText={touched.fechaFinGestion && errors.fechaFinGestion}
                                     />
                                 </Grid>
                             </Grid>

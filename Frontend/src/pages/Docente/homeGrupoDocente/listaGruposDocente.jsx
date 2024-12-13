@@ -63,6 +63,10 @@ function ListaGruposDocente() {
     localStorage.setItem('idGrupo', idGrupo);
     navigate('/homeDocente');
   };
+  const handleClick2 = (idGrupo) => {
+    localStorage.setItem('idGrupo', idGrupo);
+    navigate('/crearFechasLimitesGrupo');
+  };
 
   if (loading) {
     return (
@@ -139,6 +143,14 @@ function ListaGruposDocente() {
             <Typography variant="body1" marginTop={'1rem'} color='red'>No hay grupos en curso.</Typography>
           )}
         </Grid>
+        <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleClick2()}
+                      sx={{ marginTop: 2 }}
+                    >
+                      Crear Grupo
+                    </Button>
 
         <Typography variant="h5" gutterBottom marginTop={'1rem'}>
           Grupos Pasados
