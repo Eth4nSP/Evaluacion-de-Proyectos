@@ -46,6 +46,10 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "post-install-cmd": [
+            "rm -rf public/storage",
+            "php artisan storage:link"
         ]
     },
     "extra": {
