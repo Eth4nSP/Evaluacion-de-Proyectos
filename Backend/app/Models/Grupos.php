@@ -9,9 +9,16 @@ class Grupos extends Model
     protected $primaryKey = 'idGrupo';
     public $timestamps = false;
     protected $fillable = [
+        'idDocente',
         'numGrupo',
         'gestionGrupo',
-        'idDocente',
+        'codigoAcceso',
+        'descripcion',
+        'fechaIniGestion',
+        'fechaFinGestion',
+        'fechaLimiteEntregaEmpresa',
+        'fechaLimiteEntregaPlanificacion',
+        'fechaFinPlanificacion',
     ];
 
     public function docentes()

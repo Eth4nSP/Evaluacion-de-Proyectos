@@ -285,4 +285,4 @@ Route::get('/estudiante/visualizarSemestres', [GestionController::class, 'visual
 
 Route::post('/docente/guardarGestionSeleccionada', [GestionController::class, 'guardarGestionSeleccionadaDocente']);
 
-
+Route::post('/crearGrupo', [GrupoController::class, 'crearGrupo']);
