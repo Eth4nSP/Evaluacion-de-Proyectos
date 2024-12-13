@@ -50,7 +50,7 @@ Route::get('/tarea/{idTarea}/{idEmpresa}', [TareaController::class, 'obtenerTare
 Route::get('/estudiante/gruposDocente', [GrupoController::class, 'obtenerTodosLosGrupos']);
 Route::get('/estudiante/descripcionGrupo/{idGrupo}', [GrupoController::class, 'getDescripcion']);
 Route::get('/estudiante/sprint/semana/{idSprint}',[SprintController::class, 'sprintsSemanas']);
-Route::get('/estudiante/obtenerEmpresasPorGrupoYDocenteEstudiante',[GrupoController::class, 'obtenerEmpresasPorGrupoYDocenteEstudiante']);
+Route::get('/estudiante/obtenerEmpresasPorGrupoYDocenteEstudiante/{idGrupo}',[GrupoController::class, 'obtenerEmpresasPorGrupoYDocenteEstudiante']);
 
 //============================= GET DOCENTE ================================
 //---Recibe la lista de estudiantes de un grupo especifico del docente activo

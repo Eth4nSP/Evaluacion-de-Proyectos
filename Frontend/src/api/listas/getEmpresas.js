@@ -16,9 +16,7 @@ export const fetchEmpresas = async(url) => {
         );
 
 
-        const result = await response.json();
-        console.log(result);
-        return result
+        return response;
     } catch (err) {
         console.log(err);
     }

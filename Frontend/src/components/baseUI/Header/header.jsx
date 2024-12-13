@@ -44,7 +44,6 @@ function Header() {
   };
   const random = Cookies.get('random');
   const role = decrypt(random);
-  console.log(window.location.pathname);
   return (
     <Box >
       <AppBar position="fixed">

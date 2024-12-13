@@ -1,6 +1,8 @@
 const apiHost = import.meta.env.VITE_HOST;
 import {useState, useEffect } from 'react';
 import ListaDefinitivaN from '../../../components/listaDefinitiva/listaDefinitivaN';
+import Cookies from 'js-cookie';
+import { decrypt } from '../../../api/decrypt';
 const columns = [
   {
     field: 'nombreCompleto',
@@ -25,6 +27,9 @@ const columns = [
 export default function DataTable() {
   const [estudiantes, setEstudiantes] = useState([]);
   const [loading, setLoading] = useState(false);
+    
+  const userRole = Cookies.get('random');
+  const decryptedRole = decrypt(userRole);
   const [error, setError] = useState({
     error: false,
     errorMessage: "",
@@ -86,7 +91,7 @@ export default function DataTable() {
       datosTabla={estudiantes}
       ocultarAtras={false}
       confirmarAtras={false}
-      dirBack="/homeDocente"
+      dirBack={decryptedRole === 'docente'?"/homeDocente":"/homeEstu"}
       dirForward=""
       mensajeSearch = "Buscar Estudiante o empresa"
       nombreContador = "Estudiantes"
