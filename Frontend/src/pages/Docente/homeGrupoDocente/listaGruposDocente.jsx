@@ -107,6 +107,14 @@ function ListaGruposDocente() {
         <Typography variant="h4" gutterBottom color="blue">
           Lista de Grupos
         </Typography>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={()=>navigate("/crearFechasLimitesGrupo")}
+          sx={{ marginTop:'0.5rem', marginBottom:'0.5rem' }}
+        >
+          Crear grupo +
+        </Button>
         <Typography variant="h5" gutterBottom>
           Grupos en Curso
         </Typography>

@@ -123,7 +123,7 @@ const FormularioCrearGrupo = () => {
             titulo={`CREAR GRUPO`}
             ocultarAtras={false}
             confirmarAtras={false}
-            dirBack={`/homeDocente`}
+            dirBack={`/`}
             loading={false}
             error={{ error: false }}
         >
@@ -171,7 +171,7 @@ const FormularioCrearGrupo = () => {
                                         ))}
                                     </TextField>
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         label="Código de Acceso"
@@ -183,19 +183,11 @@ const FormularioCrearGrupo = () => {
                                         helperText={touched.codigoAcceso && errors.codigoAcceso}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
-                                    <TextField
-                                        fullWidth
-                                        label="Descripción"
-                                        name="descripcion"
-                                        value={values.descripcion}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        error={touched.descripcion && Boolean(errors.descripcion)}
-                                        helperText={touched.descripcion && errors.descripcion}
-                                    />
+                                <Grid item xs={12}> 
+                                    <Typography color='blue' textAlign='center'>*Cuando termina una fase inmediatamente comienza la proxima   </Typography>
+                                    <Typography color='blue'textAlign='center'>*todas las fechas terminan en 23:59  </Typography>
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         label="Fecha de Inicio de Gestión"
@@ -284,7 +276,7 @@ const FormularioCrearGrupo = () => {
                                         helperText={touched.fechaFinPlanificacion && errors.fechaFinPlanificacion}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <TextField
                                         fullWidth
                                         label="Fecha Final de Gestión"
@@ -296,6 +288,23 @@ const FormularioCrearGrupo = () => {
                                         InputLabelProps={{ shrink: true }}
                                         error={touched.fechaFinGestion && Boolean(errors.fechaFinGestion)}
                                         helperText={touched.fechaFinGestion && errors.fechaFinGestion}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField
+                                        fullWidth
+                                        size='medium'
+                                        multiline
+                                        rows={10}
+                                        maxRows={10}
+                                        label="Descripción"
+                                        name="descripcion"
+                                        value={values.descripcion}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        error={touched.descripcion && Boolean(errors.descripcion)}
+                                        helperText={touched.descripcion && errors.descripcion}
+                                        inputProps={{ maxLength: 1000 }}
                                     />
                                 </Grid>
                             </Grid>
