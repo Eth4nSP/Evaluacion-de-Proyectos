@@ -30,6 +30,7 @@ import VerEvaluacionSemanalSprints from '../pages/Docente/HU77_calificarEstudian
 import VerEvaluacionSemanalListaEmpresas from '../pages/Docente/HU77_calificarEstudiante/listaEmpresasVerCalificaciones.jsx'
 import ModificarFechasLimiteGrupo from '../pages/Docente/80_modificarFechasLimites/modificarFechasLimitesGrupo.jsx'
 import ListaGruposDocente from '../pages/Docente/homeGrupoDocente/listaGruposDocente.jsx'
+import CrearFechasGestion from '../pages/Docente/crear_fechas_semestre/crearFechasLimitesGrupo.jsx';
 function NavDocente() {
   return (
     <Routes>
@@ -44,6 +45,10 @@ function NavDocente() {
       <Route
         path="/modificarFechasLimitesGrupo"
         element={<ModificarFechasLimiteGrupo />}
+      />
+      <Route
+        path="/crearFechasLimitesGrupo"
+        element={<CrearFechasGestion />}
       />
       {/** ROUTES JHON NUEVOFORMATO*/}
       <Route

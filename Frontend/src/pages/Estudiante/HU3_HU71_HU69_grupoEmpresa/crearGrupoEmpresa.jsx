@@ -34,7 +34,7 @@ const CrearGrupoEmpresa = () => {
     const fetchEstudiante = async (idEstudiante) => {
       try {
         const response = await fetch(
-          `${apiHost}}/estudiante/getDatosEst/${idEstudiante}`,{credentials: 'include'}
+          `${apiHost}/estudiante/getDatosEst/${idEstudiante}`,{credentials: 'include'}
         );
         if (!response.ok) throw new Error("Error al recuperar estudiante");
         const data = await response.json();

@@ -284,12 +284,9 @@ const FormularioFechas = () => {
                             <Typography variant="h4" align="center" gutterBottom>
                                 Gestión de Fechas
                             </Typography>
-                            <Typography  align="center" gutterBottom sx={{color:'blue'}}>
-                                *La hora de todas las fechas es 23:59
-                            </Typography>
-                            <Typography  align="center" gutterBottom sx={{color:'blue'}}>
-                                *las fechas son seguidas  obligatoriamente
-                            </Typography>
+                            
+                            <Typography color='blue' textAlign='center'>*Cuando termina una fase inmediatamente comienza la proxima   </Typography>
+                            <Typography color='blue'textAlign='center'>*todas las fechas terminan en 23:59  </Typography>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField

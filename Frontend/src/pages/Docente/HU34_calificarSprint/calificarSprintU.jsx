@@ -263,6 +263,15 @@ function CalificarSprintU() {
       <Error></Error>;
     </BaseUI>
   )
+
+  const handleDownloadFile = async (file) => {
+    const url = file
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name || 'archivo';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
   
   return (
     <BaseUI
@@ -335,7 +344,7 @@ function CalificarSprintU() {
                 <FileInfo>
                   {entregable.archivoEntregable ? (
                     <Link
-                      href={entregable.archivoEntregable}
+                      onClick={() => handleDownloadFile(entregable.archivoEntregable)}
                       target="_blank"
                       underline="hover"
                     >

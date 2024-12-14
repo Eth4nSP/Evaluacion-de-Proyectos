@@ -55,6 +55,41 @@ class GrupoController extends Controller
         return response()->json(['message' => 'Grupo actualizado correctamente'], 200);
     }
 
+    public function crearGrupo(Request $request)
+    {
+        $validatedData = $request->validate([
+            'numGrupo' => 'required|integer',
+            'gestionGrupo' => 'required|string|max:10',
+            'codigoAcceso' => 'required|string|max:50',
+            'descripcion' => 'nullable|string|max:255',
+            'fechaIniGestion' => 'required|date',
+            'fechaFinGestion' => 'required|date',
+            'fechaLimiteEntregaEmpresa' => 'required|date',
+            'fechaLimiteEntregaPlanificacion' => 'required|date',
+            'fechaFinPlanificacion' => 'required|date',
+        ]);
+    
+        try {
+            $grupo = new Grupo();
+            $grupo->numGrupo = $validatedData['numGrupo'];
+            $grupo->gestionGrupo = $validatedData['gestionGrupo'];
+            $grupo->codigoAcceso = $validatedData['codigoAcceso'];
+            $grupo->descripcion = $validatedData['descripcion'];
+            $grupo->fechaIniGestion = $validatedData['fechaIniGestion'];
+            $grupo->fechaFinGestion = $validatedData['fechaFinGestion'];
+            $grupo->fechaLimiteEntregaEmpresa = $validatedData['fechaLimiteEntregaEmpresa'];
+            $grupo->fechaLimiteEntregaPlanificacion = $validatedData['fechaLimiteEntregaPlanificacion'];
+            $grupo->fechaFinPlanificacion = $validatedData['fechaFinPlanificacion'];
+    
+            $grupo->save();
+    
+            return response()->json(['message' => 'Grupo creado exitosamente', 'grupo' => $grupo], 201);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error al crear el grupo', 'error' => $e->getMessage()], 500);
+        }
+    }
+    
+
 
 
     public function obtenerTodosLosGrupos()
