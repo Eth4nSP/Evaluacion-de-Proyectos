@@ -93,6 +93,7 @@ const FormularioCrearGrupo = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(valores),
+                credentials: 'include',
             });
 
             if (!response.ok) {
