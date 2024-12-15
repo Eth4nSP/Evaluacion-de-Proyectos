@@ -70,7 +70,7 @@ class ComentarioTareaController extends Controller
     }
     public function seguimientoSemanalEmpresaHastaSemanaActual($idPlanificacion)
     {
-        // Obtener la planificación aceptada y publicada
+        $now = Carbon::now()->startOfDay();  // Establece la hora a las 00:00:00
         $planificacion = Planificacion::where('idPlanificacion', $idPlanificacion)
             ->where('aceptada', true)
             ->where('publicada', true)
@@ -92,9 +92,8 @@ class ComentarioTareaController extends Controller
 
         // Obtener todas las semanas asociadas a la planificación hasta la fecha actual
         $semanas = Semana::where('idPlanificacion', $planificacion->idPlanificacion)
-            ->whereDate('fechaFin', '<=', now())
+            ->whereDate('fechaFin', '<', $now)
             ->get();
-
         // Construir el resultado con los datos básicos y el estado de calificación
         $resultado = $semanas->map(function ($semana) use ($numEstudiantes) {
             $numComentariosTarea = ComentarioTarea::where('idSemana', $semana->idSemana)->count();

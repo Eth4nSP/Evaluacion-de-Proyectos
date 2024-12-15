@@ -3,17 +3,15 @@ import CardGeneral from '../cardGeneral'
 import { useNavigate } from "react-router-dom";
 function CardResumen() {
   const navigate = useNavigate();
-  const fechaLimiteEntregaPlani = new Date(localStorage.getItem("fechaLimiteEntregaPlanificacion"))
+  const fechaLimiteEntregaPlani = new Date(`${localStorage.getItem("fechaLimiteEntregaPlanificacion")}T23:59:59`)
   const paso = fechaLimiteEntregaPlani < new Date()
-  const fecha = new Date(localStorage.getItem("fechaLimiteEntregaPlanificacion"))
-  fecha.setDate(fecha.getDate() + 1);
   return (
     <CardGeneral
         titulo = "Lista y Datos"
         info = {<>
         </>}
         buttons={<> 
-        {!paso&&<p>Se habilitara cuando pase la fecha de entrega planificacion: {fecha.toISOString().split('T')[0]}</p>}
+        {!paso&&<p>Se habilitara en la fecha: {fechaLimiteEntregaPlani.toISOString().split('T')[0]}</p>}
         <Button 
           variant="outlined" 
           color="primary" 

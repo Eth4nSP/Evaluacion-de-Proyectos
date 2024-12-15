@@ -13,11 +13,11 @@ function CardResumen() {
         info = {<>
         {inicio?
           <>
-          <Typography>La semana Inicio el: {localStorage.getItem('fechaIniSemana')} a las 23:59.59</Typography>
+          <Typography>La semana Inicio el: {localStorage.getItem('fechaIniSemana')} a las 00:00</Typography>
           <Typography>Fecha limite de entrega del seguimiento: {localStorage.getItem('fechaLimiteSemana')} a las 23:59</Typography>
           </>
           :
-          <Typography>El seguimiento iniciara: {localStorage.getItem('fechaLimiteEntregaPlanificacion')} a las 23:59</Typography>
+          <Typography>El seguimiento iniciara: {localStorage.getItem('fechaLimiteEntregaPlanificacion')} a las 00:00</Typography>
         }
         </>}
         buttons={inicio?

@@ -23,7 +23,13 @@ class SesionEstudianteController extends Controller
     {
         $idGrupo = $request->idGrupo;
         $now = Carbon::now();
+        $now->subDay(); //resta un dia ya que cuando se compara las fechas guardadas en la base de datos, 
+        //se compara con la hora 00:00
+        $now->setHour(23);      // Establece la hora a las 23
+        $now->setMinute(59);    // Establece los minutos a 59
+        $now->setSecond(59);     // Establece los segundos a 59
         $idEstudiante = session('estudiante.id');
+        
 
         $estudiante = Estudiante::find($idEstudiante);
         if (!$estudiante) {

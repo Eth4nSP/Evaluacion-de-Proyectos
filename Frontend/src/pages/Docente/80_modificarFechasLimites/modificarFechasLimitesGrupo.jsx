@@ -21,9 +21,10 @@ import { getOriginDocente } from '../../../api/getDatosLogin';
 import InfoSnackbar from '../../../components/infoSnackbar/infoSnackbar';
 import { fechasSubmit } from '../../../api/subirFechas';
 import { getPlanificacionesAceptadas } from '../../../api/getPlanificacionesAceptadas';
-
+import { useDateOperations } from '../../../hooks/aumentarDias';
 
 const FormularioFechas = () => {
+    const { addDays } = useDateOperations();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
@@ -284,9 +285,9 @@ const FormularioFechas = () => {
                             <Typography variant="h4" align="center" gutterBottom>
                                 Gestión de Fechas
                             </Typography>
-                            
                             <Typography color='blue' textAlign='center'>*Cuando termina una fase inmediatamente comienza la proxima   </Typography>
-                            <Typography color='blue'textAlign='center'>*todas las fechas terminan en 23:59  </Typography>
+                            <Typography color='blue'textAlign='center'>*todas las fechas limite tienen la hora 23:59</Typography>
+                            <Typography color='blue'textAlign='center'>*todas las fechas inicio tienen la hora 00:00</Typography>
                             <Grid container spacing={2}>
                                 <Grid item xs={12}>
                                     <TextField
@@ -331,7 +332,7 @@ const FormularioFechas = () => {
                                             fullWidth
                                             label="Fecha inicial de Entrega de planificacion"
                                             type="date"
-                                            value={values.fechaLimiteEntregaEmpresa}
+                                            value={addDays(values.fechaLimiteEntregaEmpresa, 1)}
                                             onBlur={handleBlur}
                                             disabled
                                             sx={{flexGrow:'1'}}
@@ -356,7 +357,7 @@ const FormularioFechas = () => {
                                             fullWidth
                                             label="Fecha Inicial de planificacion"
                                             type="date"
-                                            value={values.fechaLimiteEntregaPlanificacion}
+                                            value={addDays(values.fechaLimiteEntregaPlanificacion, 1)}
                                             onBlur={handleBlur}
                                             disabled
                                             sx={{flexGrow:'1'}}

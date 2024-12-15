@@ -83,7 +83,7 @@ const ListaSprints = () => {
                 {sprints.map((sprint, index) => {
                     const formatoIni = (sprint.fechaIni)+" a las 00:00"
                     const formatoFin = (sprint.fechaFin)+" a las 23:59"
-                    return (new Date() > new Date(sprint.fechaFin) ? (
+                    return (new Date() > new Date(`${sprint.fechaFin}T23:59:59`) ? (
                         <Box
                             key={index}
                             onClick={() => clickBoton(sprint.idSprint)}

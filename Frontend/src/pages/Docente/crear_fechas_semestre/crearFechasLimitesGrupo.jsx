@@ -12,8 +12,9 @@ import {
 } from '@mui/material';
 import BaseUI from '../../../components/baseUI/baseUI';
 import InfoSnackbar from '../../../components/infoSnackbar/infoSnackbar';
-
+import { useDateOperations } from '../../../hooks/aumentarDias';
 const FormularioCrearGrupo = () => {
+    const { addDays } = useDateOperations();
     const [snackbar, setSnackbar] = useState({
         open: false,
         message: "",
@@ -232,7 +233,7 @@ const FormularioCrearGrupo = () => {
                                         fullWidth
                                         label="Fecha Inicial de Entrega de Planificación"
                                         type="date"
-                                        value={values.fechaLimiteEntregaEmpresa}
+                                        value={addDays(values.fechaLimiteEntregaEmpresa, 1)}
                                         onBlur={handleBlur}
                                         InputLabelProps={{ shrink: true }}
                                         disabled
@@ -257,7 +258,7 @@ const FormularioCrearGrupo = () => {
                                         fullWidth
                                         label="Fecha Inicial de Planificación"
                                         type="date"
-                                        value={values.fechaLimiteEntregaPlanificacion}
+                                        value={addDays(values.fechaLimiteEntregaPlanificacion, 1)}
                                         onBlur={handleBlur}
                                         InputLabelProps={{ shrink: true }}
                                         disabled
