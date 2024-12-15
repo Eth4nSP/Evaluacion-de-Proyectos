@@ -88,7 +88,7 @@ const FormularioCrearGrupo = () => {
 
     const manejarSubmit = async (valores) => {
         try {
-            const response = await fetch(`${apiHost}}/crearGrupo`, {
+            const response = await fetch(`${apiHost}/crearGrupo`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
