@@ -8,7 +8,8 @@ use App\Models\Grupo;
 use App\Http\Controllers\Controller;
 use function Laravel\Prompts\select;
 use App\Http\Controllers\Docente\SesionDocenteController as SesionDocente;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class GrupoController extends Controller
 {   
@@ -56,50 +57,51 @@ class GrupoController extends Controller
     }
 
     public function crearGrupo(Request $request)
-{
-    $validatedData = $request->validate([
-        'numGrupo' => 'required|integer',
-        'gestionGrupo' => 'required|string|max:10',
-        'codigoAcceso' => 'required|string|max:50|unique:grupos,codigoAcceso', // Evitar duplicados
-        'descripcion' => 'nullable|string|max:255',
-        'fechaIniGestion' => 'required|date',
-        'fechaFinGestion' => 'required|date|after:fechaIniGestion', // Asegura orden lógico
-        'fechaLimiteEntregaEmpresa' => 'required|date|after:fechaIniGestion|before:fechaFinGestion',
-        'fechaLimiteEntregaPlanificacion' => 'required|date|after:fechaIniGestion|before:fechaFinGestion',
-        'fechaFinPlanificacion' => 'required|date|after:fechaLimiteEntregaPlanificacion',
-    ]);
-
-    try {
-        DB::beginTransaction(); // Inicia una transacción
-
-        $grupo = new Grupo();
-        $grupo->numGrupo = $validatedData['numGrupo'];
-        $grupo->gestionGrupo = $validatedData['gestionGrupo'];
-        $grupo->codigoAcceso = $validatedData['codigoAcceso'];
-        $grupo->descripcion = $validatedData['descripcion'];
-        $grupo->fechaIniGestion = $validatedData['fechaIniGestion'];
-        $grupo->fechaFinGestion = $validatedData['fechaFinGestion'];
-        $grupo->fechaLimiteEntregaEmpresa = $validatedData['fechaLimiteEntregaEmpresa'];
-        $grupo->fechaLimiteEntregaPlanificacion = $validatedData['fechaLimiteEntregaPlanificacion'];
-        $grupo->fechaFinPlanificacion = $validatedData['fechaFinPlanificacion'];
-
-        $grupo->save();
-
-        DB::commit(); // Confirma la transacción
-
-        return response()->json(['message' => 'Grupo creado exitosamente', 'grupo' => $grupo], 201);
-    } catch (QueryException $qe) {
-        DB::rollBack(); // Revierte la transacción en caso de error
-        Log::error('Error en la base de datos al crear grupo: ' . $qe->getMessage());
-        return response()->json(['message' => 'Error al crear el grupo', 'error' => 'Error en la base de datos.'], 500);
-    } catch (ValidationException $ve) {
-        return response()->json(['message' => 'Datos inválidos', 'errors' => $ve->errors()], 422);
-    } catch (\Exception $e) {
-        DB::rollBack(); // Revierte la transacción en caso de error
-        Log::error('Error inesperado al crear grupo: ' . $e->getMessage());
-        return response()->json(['message' => 'Error inesperado al crear el grupo', 'error' => $e->getMessage()], 500);
+    {
+        $validatedData = $request->validate([
+            'numGrupo' => 'required|integer',
+            'gestionGrupo' => 'required|string|max:10',
+            'codigoAcceso' => 'required|string|max:50|unique:grupo,codigoAcceso',
+            'descripcion' => 'nullable|string|max:255',
+            'fechaIniGestion' => 'required|date',
+            'fechaFinGestion' => 'required|date|after:fechaIniGestion',
+            'fechaLimiteEntregaEmpresa' => 'required|date|after:fechaIniGestion|before:fechaFinGestion',
+            'fechaLimiteEntregaPlanificacion' => 'required|date|after:fechaLimiteEntregaEmpresa|before:fechaFinGestion',
+            'fechaFinPlanificacion' => 'required|date|after:fechaLimiteEntregaPlanificacion|before:fechaFinGestion',
+        ]);
+    
+        try {
+            DB::beginTransaction();
+    
+            $idDocente = session('docente.id');
+    
+            $grupo = new Grupo();
+            $grupo->idDocente = $idDocente; 
+            $grupo->numGrupo = $validatedData['numGrupo'];
+            $grupo->gestionGrupo = $validatedData['gestionGrupo'];
+            $grupo->codigoAcceso = $validatedData['codigoAcceso'];
+            $grupo->descripcion = $validatedData['descripcion'];
+            $grupo->fechaIniGestion = $validatedData['fechaIniGestion'];
+            $grupo->fechaFinGestion = $validatedData['fechaFinGestion'];
+            $grupo->fechaLimiteEntregaEmpresa = $validatedData['fechaLimiteEntregaEmpresa'];
+            $grupo->fechaLimiteEntregaPlanificacion = $validatedData['fechaLimiteEntregaPlanificacion'];
+            $grupo->fechaFinPlanificacion = $validatedData['fechaFinPlanificacion'];
+    
+            $grupo->save();
+    
+            DB::commit();
+    
+            return response()->json(['message' => 'Grupo creado exitosamente', 'grupo' => $grupo], 201);
+        } catch (\Illuminate\Database\QueryException $qe) {
+            DB::rollBack();
+            Log::error('Error en la base de datos al crear grupo: ' . $qe->getMessage());
+            return response()->json(['message' => 'Error en la base de datos.', 'error' => $qe->getMessage()], 500);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error inesperado al crear grupo: ' . $e->getMessage());
+            return response()->json(['message' => 'Error inesperado.', 'error' => $e->getMessage()], 500);
+        }
     }
-}
 
 
 
