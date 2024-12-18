@@ -106,7 +106,7 @@ const PublicarGrupoEmpresa = () => {
             return
         }
         try {
-            const response = await fetch(`${apiHost}}/crearGrupoEmpresa/paso3/${idEstudiante}`, {
+            const response = await fetch(`${apiHost}/crearGrupoEmpresa/paso3/${idEstudiante}`, {
                 method: 'POST', 
                 headers: {
                     'Content-Type': 'application/json',
